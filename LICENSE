@@ -1,0 +1,22 @@
+RepeatMasker is distributed under the Open Software License v. 2.1.
+
+The full upstream license text is included in the official RepeatMasker
+distribution as LICENSE and begins:
+
+Open Software License v. 2.1
+============================
+This Open Software License (the "License") applies to any original work
+of authorship (the "Original Work") whose owner (the "Licensor") has
+placed the following notice immediately following the copyright notice
+for the Original Work: Licensed under the Open Software License version 2.1
+
+SPDX-License-Identifier: OSL-2.1
+
+The RepeatMasker distribution also includes FamDB Python code under CC0 and
+Dfam/FamDB database material. RMBlast bundled in this container is licensed as
+described by repeatmasker.org and includes NCBI public-domain BLAST+ notices.
+
+This container also includes UCSC Genome Browser command-line utilities
+twoBitInfo and bedToBigBed because RepeatMasker utility scripts call them for
+2bit summaries and track-hub generation. Consult the UCSC Genome Browser/Kent
+source terms for those tools.
