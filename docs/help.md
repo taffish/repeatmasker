@@ -1,4 +1,4 @@
-taf-repeatmasker 4.2.3-r1
+taf-repeatmasker 4.2.3-r2
 
 RepeatMasker screens DNA FASTA sequences for interspersed repeats and
 low-complexity DNA. This app defaults to upstream RepeatMasker and includes
@@ -21,6 +21,7 @@ Wrapper options:
 
 Default upstream command:
   taf-repeatmasker -- -help
+  taf-repeatmasker -- --help
   taf-repeatmasker -- -v
   taf-repeatmasker -pa 4 -engine rmblast -lib repeats.fa genome.fa
 
@@ -69,6 +70,11 @@ Packaged commands:
 Outputs:
   Typical runs write .out repeat annotations, .masked FASTA, .tbl summaries,
   optional .align alignments, .cat files, and optional .gff output.
+
+Help behavior:
+  Upstream RepeatMasker normally uses a pager for help. This app sets PAGER=cat
+  so RepeatMasker -help and --help print directly and exit in non-interactive
+  TAFFISH, Docker, Podman, CI, and flow contexts.
 
 Platform:
   Native platform is linux/amd64 only because this app uses the official

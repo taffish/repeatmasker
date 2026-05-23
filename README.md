@@ -8,9 +8,9 @@ DNA.
 
 - name: `repeatmasker`
 - command: `taf-repeatmasker`
-- version: `4.2.3-r1`
+- version: `4.2.3-r2`
 - kind: `tool`
-- image: `ghcr.io/taffish/repeatmasker:4.2.3-r1`
+- image: `ghcr.io/taffish/repeatmasker:4.2.3-r2`
 - upstream: RepeatMasker `4.2.3`
 - runtime version: `RepeatMasker version 4.2.3`
 - default command: `RepeatMasker`
@@ -18,9 +18,10 @@ DNA.
 - native platform: `linux/amd64`
 
 The image is configured non-interactively with RMBlast, TRF, HMMER, and small
-UCSC helper tools used by RepeatMasker utilities. It is intended for offline
-custom-library runs and for Dfam/FamDB runs when users provide the required
-database partitions.
+UCSC helper tools used by RepeatMasker utilities. `PAGER=cat` is set so
+upstream RepeatMasker help prints and exits instead of entering `more`. The app
+is intended for offline custom-library runs and for Dfam/FamDB runs when users
+provide the required database partitions.
 
 ## Install
 
@@ -42,6 +43,7 @@ Upstream RepeatMasker help and version:
 
 ```sh
 taf-repeatmasker -- -help
+taf-repeatmasker -- --help
 taf-repeatmasker -- -v
 taf-repeatmasker RepeatMasker -v
 ```
@@ -128,7 +130,9 @@ Search/runtime tools include:
 - Perl, Python 3, Python h5py, curl, gzip, tar, and required shared libraries
 
 `BLAST_USAGE_REPORT=false` is set by default so RMBlast does not report usage
-statistics during local TAFFISH runs.
+statistics during local TAFFISH runs. `PAGER=cat` is set by default so
+RepeatMasker help remains non-interactive and works predictably in terminals,
+pipelines, CI, and TAFFISH flow contexts.
 
 ## Libraries And Data
 
@@ -197,7 +201,7 @@ Please refer to:
 Smoke tests cover:
 
 - RepeatMasker, RMBlast, TRF, HMMER, and usage-reporting version/state checks.
-- RepeatMasker help and ProcessRepeats help.
+- RepeatMasker non-interactive `--help` and ProcessRepeats help.
 - FamDB info for the included Dfam 3.9 root partition.
 - RepeatMasker configuration paths for RMBlast, TRF, HMMER, and default engine.
 - A tiny offline `RepeatMasker -lib` run producing `.out` and `.masked`.

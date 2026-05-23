@@ -159,6 +159,7 @@ COPY --from=fetcher /opt/ucsc /opt/ucsc
 
 ENV PATH=/opt/RepeatMasker:/opt/RepeatMasker/util:/opt/rmblast/bin:/opt/ucsc/bin:${PATH}
 ENV BLAST_USAGE_REPORT=false
+ENV PAGER=cat
 ENV REPEATMASKER_LIB_DIR=/opt/RepeatMasker/Libraries
 
 RUN set -eux; \
@@ -169,6 +170,9 @@ RUN set -eux; \
       -hmmer_dir /usr/bin \
       -default_search_engine rmblast; \
     RepeatMasker -v 2>&1 | grep -F "RepeatMasker version ${REPEATMASKER_VERSION}" >/dev/null; \
+    RepeatMasker --help >/tmp/repeatmasker.help 2>&1; \
+    grep -F "RepeatMasker is a program that screens DNA sequences" /tmp/repeatmasker.help >/dev/null; \
+    rm -f /tmp/repeatmasker.help; \
     rmblastn -version 2>&1 | grep -F "rmblastn: ${RMBLAST_VERSION}+" >/dev/null; \
     trf -v 2>&1 | grep -F "Tandem Repeats Finder, Version 4.09" >/dev/null; \
     nhmmer -h 2>&1 | grep -F "HMMER" >/dev/null; \
