@@ -1,2 +1,0 @@
-<taf-app:container:ghcr.io/taffish/repeatmasker:4.2.3-r2$@[docker: --platform linux/amd64][podman: --platform linux/amd64]>
-RepeatMasker ::*ARGV*::

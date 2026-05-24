@@ -8,9 +8,9 @@ DNA.
 
 - name: `repeatmasker`
 - command: `taf-repeatmasker`
-- version: `4.2.3-r2`
+- version: `4.2.3-r3`
 - kind: `tool`
-- image: `ghcr.io/taffish/repeatmasker:4.2.3-r2`
+- image: `ghcr.io/taffish/repeatmasker:4.2.3-r3`
 - upstream: RepeatMasker `4.2.3`
 - runtime version: `RepeatMasker version 4.2.3`
 - default command: `RepeatMasker`
@@ -178,6 +178,10 @@ This core image does not include:
 The smoke tests validate the configured program stack and small offline
 functional runs. They do not substitute for full biological validation on large
 genomes or species-specific repeat libraries.
+
+## License Boundary
+
+The TAFFISH app packaging files are licensed under Apache-2.0. The packaged upstream RepeatMasker software is covered by: OSL-2.1 with bundled Dfam/FamDB CC0 code/data notices, RMBlast/NCBI components, and UCSC command-line utilities. Bundled third-party components, datasets, models, and external resources keep their own license terms.
 
 ## License And Citation
 

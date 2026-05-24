@@ -1,4 +1,4 @@
-taf-repeatmasker 4.2.3-r2
+taf-repeatmasker 4.2.3-r3
 
 RepeatMasker screens DNA FASTA sequences for interspersed repeats and
 low-complexity DNA. This app defaults to upstream RepeatMasker and includes
@@ -80,6 +80,12 @@ Platform:
   Native platform is linux/amd64 only because this app uses the official
   RMBlast x64 Linux binary. Docker and Podman request --platform linux/amd64;
   arm64 hosts use amd64 emulation, not native arm64 execution.
+
+License:
+  TAFFISH app packaging: Apache-2.0.
+  Upstream software: OSL-2.1 with bundled Dfam/FamDB CC0 code/data notices, RMBlast/NCBI components, and UCSC command-line utilities.
+  Bundled components, data, models, and external resources keep their
+  own license terms.
 
 Boundaries:
   This app does not include full Dfam partitions, RepBase, cross_match, or
