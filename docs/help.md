@@ -1,8 +1,9 @@
-taf-repeatmasker 4.2.3-r3
+taf-repeatmasker 4.2.4-r1
 
 RepeatMasker screens DNA FASTA sequences for interspersed repeats and
-low-complexity DNA. This app defaults to upstream RepeatMasker and includes
-RMBlast, TRF, HMMER, FamDB tools, UCSC helpers, and RepeatMasker utilities.
+low-complexity DNA. This app defaults to upstream RepeatMasker through a small
+entrypoint and includes RMBlast, TRF, HMMER, FamDB tools, UCSC helpers, and
+RepeatMasker utilities.
 
 Usage:
   taf-repeatmasker [-h | --help]
@@ -33,6 +34,8 @@ Command mode:
   taf-repeatmasker rmToTrackHub.pl -out genome.fa.out -genome hg38
   taf-repeatmasker rmblastn -version
   taf-repeatmasker trf -v
+  taf-repeatmasker famdb.py --help
+  taf-repeatmasker download_dfam.py --help
 
 Common custom-library workflow:
   taf-repeatmasker -pa 8 -engine rmblast -lib repeats.fa -dir rm-out genome.fa
@@ -42,11 +45,27 @@ Common Dfam/FamDB workflow:
   taf-repeatmasker -pa 8 -engine rmblast -species "Homo sapiens" genome.fa
 
 Important data note:
-  The official RepeatMasker 4.2.3 package includes the Dfam 3.9 root partition
-  only. That root partition is required metadata and contains a small number of
-  root-level families. Full species/clade coverage requires adding matching
-  Dfam FamDB partitions under /opt/RepeatMasker/Libraries/famdb or using a
-  custom FASTA library with -lib. RepBase is not included.
+  RepeatMasker 4.2.4 no longer bundles Dfam data. This app packages FamDB
+  3.0.0 and configures FamDB itself to read Dfam component files from:
+    /opt/RepeatMasker/Libraries/famdb
+
+  Custom-library runs with -lib do not need Dfam data. To keep that mode
+  working, the static RepeatMasker config leaves FamDB disabled when no .h5
+  files are present. Species or clade runs with -species require Dfam 4.x
+  FamDB component files; when mounted .h5 files exist, the default entrypoint
+  enables FamDB before running RepeatMasker. The wrapper auto-mounts an
+  existing local directory when one of these paths exists:
+    TAFFISH_REPEATMASKER_FAMDB_PATH
+    ~/.local/share/taffish/databases/repeatmasker/dfam4
+    /usr/local/share/taffish/databases/repeatmasker/dfam4
+    /opt/taffish/databases/repeatmasker/dfam4
+
+  To prepare personal data, create and enter the database root, then run:
+    mkdir -p ~/.local/share/taffish/databases/repeatmasker/dfam4
+    cd ~/.local/share/taffish/databases/repeatmasker
+    taf-repeatmasker download_dfam.py -o "$PWD/dfam4"
+
+  RepBase is not included.
 
 Common options:
   -pa INT            Parallel batch jobs
@@ -61,8 +80,9 @@ Common options:
   -e VALUE           Search e-value cutoff
 
 Packaged commands:
-  RepeatMasker, ProcessRepeats, RepeatProteinMask, DupMasker, famdb.py,
-  RM2Bed.py, rmOutToGFF3.pl, buildSummary.pl, calcDivergenceFromAlign.pl,
+  RepeatMasker, taf-repeatmasker-entrypoint, ProcessRepeats,
+  RepeatProteinMask, DupMasker, famdb.py, download_dfam.py, RM2Bed.py,
+  rmOutToGFF3.pl, buildSummary.pl, calcDivergenceFromAlign.pl,
   createRepeatLandscape.pl, rmToTrackHub.pl, maskFile.pl,
   buildRMLibFromEMBL.pl, rmblastn, makeblastdb, trf, nhmmer, hmmsearch,
   twoBitInfo, bedToBigBed.
@@ -83,11 +103,13 @@ Platform:
 
 License:
   TAFFISH app packaging: Apache-2.0.
-  Upstream software: OSL-2.1 with bundled Dfam/FamDB CC0 code/data notices, RMBlast/NCBI components, and UCSC command-line utilities.
-  Bundled components, data, models, and external resources keep their
-  own license terms.
+  Upstream RepeatMasker: OSL-2.1.
+  Packaged FamDB code and Dfam data notices: CC0.
+  RMBlast/NCBI components, UCSC utilities, external Dfam components,
+  RepBase, and user-provided resources keep their own license terms.
 
 Boundaries:
-  This app does not include full Dfam partitions, RepBase, cross_match, or
-  ABBLAST. Utility network fetches such as UCSC chrom.sizes downloads and
-  large genome-scale scientific validation are outside smoke tests.
+  This app does not include Dfam component data, RepBase, cross_match, or
+  ABBLAST. Dfam download is only performed when users explicitly run
+  download_dfam.py. Utility network fetches such as UCSC chrom.sizes downloads
+  and large genome-scale scientific validation are outside smoke tests.

@@ -8,20 +8,20 @@ DNA.
 
 - name: `repeatmasker`
 - command: `taf-repeatmasker`
-- version: `4.2.3-r3`
+- version: `4.2.4-r1`
 - kind: `tool`
-- image: `ghcr.io/taffish/repeatmasker:4.2.3-r3`
-- upstream: RepeatMasker `4.2.3`
-- runtime version: `RepeatMasker version 4.2.3`
-- default command: `RepeatMasker`
+- image: `ghcr.io/taffish/repeatmasker:4.2.4-r1`
+- upstream: RepeatMasker `4.2.4`
+- runtime version: `RepeatMasker version 4.2.4`
+- default command: `RepeatMasker` through `taf-repeatmasker-entrypoint`
 - default search engine: `rmblast`
 - native platform: `linux/amd64`
 
 The image is configured non-interactively with RMBlast, TRF, HMMER, and small
-UCSC helper tools used by RepeatMasker utilities. `PAGER=cat` is set so
-upstream RepeatMasker help prints and exits instead of entering `more`. The app
-is intended for offline custom-library runs and for Dfam/FamDB runs when users
-provide the required database partitions.
+UCSC helper tools used by RepeatMasker utilities. It also packages FamDB 3.0.0.
+`PAGER=cat` is set so upstream RepeatMasker help prints and exits instead of
+entering `more`. The app is intended for offline custom-library runs and for
+Dfam/FamDB runs when users provide the required Dfam component files.
 
 ## Install
 
@@ -63,13 +63,21 @@ taf-repeatmasker buildSummary.pl genome.fa.out > genome.fa.tbl
 taf-repeatmasker rmToTrackHub.pl -out genome.fa.out -genome hg38
 taf-repeatmasker rmblastn -version
 taf-repeatmasker trf -v
+taf-repeatmasker famdb.py --help
+taf-repeatmasker download_dfam.py --help
 ```
 
 ## Wrapper Semantics
 
-`taf-repeatmasker` defaults to the upstream `RepeatMasker` command. Because
-RepeatMasker uses single-dash options such as `-pa`, `-lib`, `-species`, and
-`-dir`, normal option-led calls are passed directly to RepeatMasker.
+`taf-repeatmasker` defaults to a small TAFFISH entrypoint that runs upstream
+`RepeatMasker`. Because RepeatMasker uses single-dash options such as `-pa`,
+`-lib`, `-species`, and `-dir`, normal option-led calls are passed directly to
+that default entrypoint.
+
+RepeatMasker 4.2.4 fails early if FamDB is configured but no Dfam `.h5` files
+are present. To keep custom-library `-lib` runs working without Dfam data, the
+image leaves FamDB out of the static RepeatMasker config. The entrypoint
+auto-enables FamDB only when mounted `.h5` component files are found at runtime.
 
 Command mode remains enabled. If the first argument is another executable name,
 TAFFISH runs that command in the same configured container:
@@ -82,14 +90,18 @@ taf-repeatmasker rmblastn -version
 
 ## Runtime Contents
 
-The image installs the official `RepeatMasker-4.2.3.tar.gz` release, copies
-RMBlast from the `ghcr.io/taffish/rmblast:2.17.1-r1` app image, and installs
-pinned UCSC command-line helper binaries needed by RepeatMasker utility
-scripts. The Dockerfile verifies the RepeatMasker and UCSC helper checksums:
+The image installs the official `RepeatMasker-4.2.4.tar.gz` release, installs
+FamDB `3.0.0`, copies RMBlast from the
+`ghcr.io/taffish/rmblast:2.17.1-r1` app image, and installs pinned UCSC
+command-line helper binaries needed by RepeatMasker utility scripts. The
+Dockerfile verifies the RepeatMasker, FamDB, and UCSC helper checksums:
 
 ```text
-RepeatMasker-4.2.3.tar.gz
-832e2b22aef6763ef7d5dd2771eef22f7dd8b9738bea0e1d81295aa511b61e6a
+RepeatMasker-4.2.4.tar.gz
+7407b42909c64b7ae080efb737f3f725327be81ace1ec0cd9dc13c4a503885d7
+
+FamDB-3.0.0.tar.gz
+cad4652696cbd6b3444ef1ea008764e4807eba503410bf24357c4505a5ddb8d4
 
 twoBitInfo
 fca5427e1aedd00be0d32117420010c9162d442562c83305b2d3e3c8e6cebe71
@@ -108,10 +120,12 @@ rmblast-2.17.1+-x64-linux.tar.gz
 Packaged RepeatMasker commands and utilities include:
 
 - `RepeatMasker`
+- `taf-repeatmasker-entrypoint`
 - `ProcessRepeats`
 - `RepeatProteinMask`
 - `DupMasker`
 - `famdb.py`
+- `download_dfam.py`
 - `RM2Bed.py`
 - `rmOutToGFF3.pl`
 - `buildSummary.pl`
@@ -126,6 +140,7 @@ Search/runtime tools include:
 - RMBlast `2.17.1+` (`rmblastn`, `makeblastdb`, and companion BLAST+ tools)
 - TRF `4.09.1` from Debian
 - HMMER `3.3.2` from Debian
+- FamDB `3.0.0` with Python h5py/numpy support
 - UCSC `twoBitInfo` and `bedToBigBed` helper binaries
 - Perl, Python 3, Python h5py, curl, gzip, tar, and required shared libraries
 
@@ -136,18 +151,63 @@ pipelines, CI, and TAFFISH flow contexts.
 
 ## Libraries And Data
 
-The official RepeatMasker `4.2.3` tarball includes the Dfam `3.9` root FamDB
-partition:
+RepeatMasker `4.2.4` no longer bundles a local Dfam root partition. Upstream
+now treats FamDB as a separate optional package and Dfam `4.0` as external
+component data. This image includes the FamDB `3.0.0` program and configures
+FamDB itself to look for data in:
 
 ```text
-/opt/RepeatMasker/Libraries/famdb/dfam39_full.0.h5
+/opt/RepeatMasker/Libraries/famdb
 ```
 
-This root partition is required metadata and contains a small set of root-level
-families. It is not the full Dfam database. Full species or clade coverage
-requires adding matching Dfam `3.9` FamDB partitions under
-`/opt/RepeatMasker/Libraries/famdb`, or using `-lib` with a custom FASTA repeat
-library.
+Custom-library runs with `-lib` do not need FamDB data. Species or clade
+queries with `-species` require Dfam component files. When `.h5` component
+files are mounted at the path above, the default TAFFISH entrypoint configures
+RepeatMasker with `/opt/FamDB` before running the command. For most
+RepeatMasker use cases, upstream FamDB recommends downloading the root
+component plus curated consensus files; curated HMM files add sensitivity. A
+complete Dfam 4.0 download is very large and is not bundled.
+
+The wrapper automatically mounts an existing local Dfam/FamDB directory to
+`/opt/RepeatMasker/Libraries/famdb` when one of these paths exists, and the
+entrypoint then enables FamDB for RepeatMasker:
+
+```text
+TAFFISH_REPEATMASKER_FAMDB_PATH
+~/.local/share/taffish/databases/repeatmasker/dfam4
+/usr/local/share/taffish/databases/repeatmasker/dfam4
+/opt/taffish/databases/repeatmasker/dfam4
+```
+
+Personal setup example:
+
+```sh
+mkdir -p ~/.local/share/taffish/databases/repeatmasker/dfam4
+cd ~/.local/share/taffish/databases/repeatmasker
+taf-repeatmasker download_dfam.py -o "$PWD/dfam4"
+taf-repeatmasker famdb.py -i "$PWD/dfam4" info
+```
+
+Administrator setup can use `/usr/local/share/taffish/databases/repeatmasker`
+with the same `dfam4` directory name, then make the files readable by users.
+For one-off data elsewhere, set:
+
+```sh
+TAFFISH_REPEATMASKER_FAMDB_PATH=/abs/path/dfam4 \
+taf-repeatmasker -pa 8 -engine rmblast -species "Homo sapiens" genome.fa
+```
+
+To disable auto-mount and provide backend args manually:
+
+```sh
+TAFFISH_REPEATMASKER_AUTO_MOUNT=0 \
+TAFFISH_DOCKER_RUN_ARGS="-v /abs/path/dfam4:/opt/RepeatMasker/Libraries/famdb:ro" \
+taf-repeatmasker -pa 8 -engine rmblast -species "Homo sapiens" genome.fa
+```
+
+Use `TAFFISH_PODMAN_RUN_ARGS` for Podman. Symlinks are resolved to their
+physical target before auto-mounting, so the target must be readable and
+visible to the selected container backend.
 
 RepBase is not included. RepBase RepeatMasker Edition and later RepBase data
 must be obtained by users under their own authorization and used according to
@@ -165,28 +225,33 @@ containers.
 
 This core image does not include:
 
-- full Dfam partitions beyond the root partition included upstream
+- full Dfam component data
 - RepBase
 - `cross_match`
 - ABBLAST/WUBlast
 - a from-source RMBlast build inside this Dockerfile; it depends on the
   `ghcr.io/taffish/rmblast:2.17.1-r1` app image at build time
-- Entrez Direct or online database download workflows, except utility scripts
-  such as `rmToTrackHub.pl` can still use `curl` to fetch UCSC chromosome sizes
-  when users request those workflows
+- Entrez Direct. The upstream `download_dfam.py` utility is packaged for
+  explicit user-initiated Dfam downloads, and utility scripts such as
+  `rmToTrackHub.pl` can still use `curl` to fetch UCSC chromosome sizes when
+  users request those workflows.
 
 The smoke tests validate the configured program stack and small offline
-functional runs. They do not substitute for full biological validation on large
-genomes or species-specific repeat libraries.
+functional runs. They do not download Dfam data and do not substitute for full
+biological validation on large genomes or species-specific repeat libraries.
 
 ## License Boundary
 
-The TAFFISH app packaging files are licensed under Apache-2.0. The packaged upstream RepeatMasker software is covered by: OSL-2.1 with bundled Dfam/FamDB CC0 code/data notices, RMBlast/NCBI components, and UCSC command-line utilities. Bundled third-party components, datasets, models, and external resources keep their own license terms.
+The TAFFISH app packaging files are licensed under Apache-2.0. The packaged
+upstream RepeatMasker software is covered by OSL-2.1. Packaged FamDB code and
+Dfam data notices are CC0, while RMBlast/NCBI components and UCSC command-line
+utilities keep their own terms. External Dfam component files, RepBase data,
+models, and other user-provided resources keep their own license terms.
 
 ## License And Citation
 
 RepeatMasker open-4.0 and later are distributed under the Open Software License
-v2.1. The bundled FamDB code is documented by upstream as CC0. RMBlast and NCBI
+v2.1. The packaged FamDB code is documented by upstream as CC0. RMBlast and NCBI
 BLAST+ notices are included through the RMBlast distribution. UCSC
 `twoBitInfo` and `bedToBigBed` are included as command-line utilities for
 RepeatMasker helper-script compatibility; consult the UCSC Genome Browser/Kent
@@ -206,9 +271,9 @@ Smoke tests cover:
 
 - RepeatMasker, RMBlast, TRF, HMMER, and usage-reporting version/state checks.
 - RepeatMasker non-interactive `--help` and ProcessRepeats help.
-- FamDB info for the included Dfam 3.9 root partition.
+- FamDB 3.0.0 help, Dfam downloader help, and missing-Dfam-data boundary.
 - RepeatMasker configuration paths for RMBlast, TRF, HMMER, and default engine.
-- A tiny offline `RepeatMasker -lib` run producing `.out` and `.masked`.
-- A tiny offline `RepeatMasker -gff -lib` run producing `.out.gff`.
+- A tiny offline default-entrypoint `-lib` run producing `.out` and `.masked`.
+- A tiny offline default-entrypoint `-gff -lib` run producing `.out.gff`.
 - Utility conversion/summary scripts on a tiny real RepeatMasker `.out` file,
   including the UCSC `twoBitInfo` helper required by `buildSummary.pl`.
