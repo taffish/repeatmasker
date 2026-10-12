@@ -1,0 +1,706 @@
+{
+  "schema": 1,
+  "release": "4.0",
+  "prefix": "dfam40",
+  "source": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/",
+  "license": "CC0-1.0",
+  "listing_sha256": "1d62eaf566372a5369bb9bd494a670c51bf66d8e5d0bb41045badc81fd915b4e",
+  "members": [
+    {
+      "file": "dfam40.0.h5.gz",
+      "compressed_bytes": 60708386,
+      "md5": "234d177775f1bf3445b1fe146bc6e65e",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.0.h5.gz"
+    },
+    {
+      "file": "dfam40.curated.consensus.0.h5.gz",
+      "compressed_bytes": 28260067,
+      "md5": "7892e18016fc820264e625cbb9ec607b",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.curated.consensus.0.h5.gz"
+    },
+    {
+      "file": "dfam40.curated.hmm.0.h5.gz",
+      "compressed_bytes": 51796624,
+      "md5": "c2e0f71f98dd19f0b493f5aa690f5c60",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.curated.hmm.0.h5.gz"
+    },
+    {
+      "file": "dfam40.curated.hmm.1.h5.gz",
+      "compressed_bytes": 2015629808,
+      "md5": "825aaef61fd0329778c34efb545c0356",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.curated.hmm.1.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.consensus.0.h5.gz",
+      "compressed_bytes": 264500,
+      "md5": "e7092e3ba01d887d4e7f84c86fa2d2ba",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.consensus.0.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.consensus.1.h5.gz",
+      "compressed_bytes": 4130166278,
+      "md5": "2803414c3420cd8b9ebbc077d78491c4",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.consensus.1.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.0.h5.gz",
+      "compressed_bytes": 1179442324,
+      "md5": "708cee4c7116d0e9391a72469926a1aa",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.0.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.1.h5.gz",
+      "compressed_bytes": 1695618970,
+      "md5": "c12fb636c83a0873be93e12bd9501c3e",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.1.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.10.h5.gz",
+      "compressed_bytes": 1350845967,
+      "md5": "c79afd6d58c2dee3f63ed30a6ff7e53d",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.10.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.100.h5.gz",
+      "compressed_bytes": 1524100331,
+      "md5": "2659ef859aa72837732d7f0b69ece9ef",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.100.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.101.h5.gz",
+      "compressed_bytes": 1791666925,
+      "md5": "929a81fdff49d8b8d5534f655786d4b1",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.101.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.102.h5.gz",
+      "compressed_bytes": 1841430161,
+      "md5": "21706f68edf41929445bde2a2e063d64",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.102.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.103.h5.gz",
+      "compressed_bytes": 2140937408,
+      "md5": "2d167982f724a3e5480c85f72549b14a",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.103.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.104.h5.gz",
+      "compressed_bytes": 1341543784,
+      "md5": "86b4fb7cf07eafe92c7f965dd6735a37",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.104.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.105.h5.gz",
+      "compressed_bytes": 1600134192,
+      "md5": "36e54c96b9302f354201e92deef8c240",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.105.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.106.h5.gz",
+      "compressed_bytes": 3350632316,
+      "md5": "5ad44607940f17597ed06ad4b4e42cf3",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.106.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.107.h5.gz",
+      "compressed_bytes": 1623009568,
+      "md5": "97940c7a3a8466b8e1c43702a4299639",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.107.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.108.h5.gz",
+      "compressed_bytes": 1509982974,
+      "md5": "6b8cf0e8f4769d82f528462483408c81",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.108.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.109.h5.gz",
+      "compressed_bytes": 1944216173,
+      "md5": "f3e8853008333c494bebcb1968a1448f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.109.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.11.h5.gz",
+      "compressed_bytes": 1700479236,
+      "md5": "ee8285f9f353bcaf6fce87da5264ba07",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.11.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.12.h5.gz",
+      "compressed_bytes": 1584741755,
+      "md5": "f4fc8e1feeacf9873ac7835946dd60e7",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.12.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.13.h5.gz",
+      "compressed_bytes": 1841306719,
+      "md5": "919abc7bde245f6d7c568980ce39dd08",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.13.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.14.h5.gz",
+      "compressed_bytes": 4082119247,
+      "md5": "7dc530b29324756499171fde967d3180",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.14.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.15.h5.gz",
+      "compressed_bytes": 1982781129,
+      "md5": "f9733f154624a170c76df7fc71285741",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.15.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.16.h5.gz",
+      "compressed_bytes": 1842369312,
+      "md5": "026fc4dcee9474be738c406491309e98",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.16.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.17.h5.gz",
+      "compressed_bytes": 2355512641,
+      "md5": "84be6fea79c3ecfaf7eddb9b6b0d8fd1",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.17.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.18.h5.gz",
+      "compressed_bytes": 2822096650,
+      "md5": "452bcf6b8569d7860e90d234ee9f8982",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.18.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.19.h5.gz",
+      "compressed_bytes": 2160234065,
+      "md5": "4595736dfbd66cf746801659ea697232",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.19.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.2.h5.gz",
+      "compressed_bytes": 1981033165,
+      "md5": "f5e94c29d85e0b81c4f9ce30bf6129fe",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.2.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.20.h5.gz",
+      "compressed_bytes": 2536417536,
+      "md5": "790fc1f1695c0d48338ee9552684d03d",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.20.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.21.h5.gz",
+      "compressed_bytes": 1475879442,
+      "md5": "ece04d588c43a1a39827ecd475cd70cc",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.21.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.22.h5.gz",
+      "compressed_bytes": 1574547087,
+      "md5": "84b3432e946578b9608336d9102a3e19",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.22.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.23.h5.gz",
+      "compressed_bytes": 1365107893,
+      "md5": "0f747342b795096d0b39194c0f6ffd2c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.23.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.24.h5.gz",
+      "compressed_bytes": 1975493865,
+      "md5": "93864cbdf4cfb998f37fda2b99b02ad8",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.24.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.25.h5.gz",
+      "compressed_bytes": 1596378750,
+      "md5": "03b8249462667f110f53d46c3ed81c1c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.25.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.26.h5.gz",
+      "compressed_bytes": 1331860745,
+      "md5": "4600bdcc8a07b78db1ae707cf535fb16",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.26.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.27.h5.gz",
+      "compressed_bytes": 2218854869,
+      "md5": "f11e4a8e7a2342f85e36b35d59e3a545",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.27.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.28.h5.gz",
+      "compressed_bytes": 2487593428,
+      "md5": "7ddb846c89bc7e5b255ff066bdcc800f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.28.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.29.h5.gz",
+      "compressed_bytes": 1090234441,
+      "md5": "369b1306ebfb0352cd4420959c0547c6",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.29.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.3.h5.gz",
+      "compressed_bytes": 1821524922,
+      "md5": "9ac888ca2b26c1bf5846b174e469886c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.3.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.30.h5.gz",
+      "compressed_bytes": 1940181408,
+      "md5": "1047a38ba6d675a52bd52359232f260e",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.30.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.31.h5.gz",
+      "compressed_bytes": 1653374371,
+      "md5": "e968db8364c8dbd4ade5bfdeb160d049",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.31.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.32.h5.gz",
+      "compressed_bytes": 1684906834,
+      "md5": "3cabf057ff3fa566bb6f746a5f20dcac",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.32.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.33.h5.gz",
+      "compressed_bytes": 1660672541,
+      "md5": "c1a905b21a8fd339505bf4de91cf9ea6",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.33.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.34.h5.gz",
+      "compressed_bytes": 1326352094,
+      "md5": "9d15ff0fce05cf478ce706cab653e73a",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.34.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.35.h5.gz",
+      "compressed_bytes": 2222654902,
+      "md5": "9db4ca6b2c6a46162289f44416341e96",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.35.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.36.h5.gz",
+      "compressed_bytes": 2811310968,
+      "md5": "86c7dff85317558640a876bc295019e2",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.36.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.37.h5.gz",
+      "compressed_bytes": 1849138209,
+      "md5": "24eefb76882d9087b7a105b656c5366a",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.37.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.38.h5.gz",
+      "compressed_bytes": 1650228563,
+      "md5": "24ae0c6157e11f48e19f4c4f363500e8",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.38.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.39.h5.gz",
+      "compressed_bytes": 2160506369,
+      "md5": "279b7c9d5ee9eaedd77dac890f75f41f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.39.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.4.h5.gz",
+      "compressed_bytes": 2353191243,
+      "md5": "f72f660082636fb87a21aa8619765bb6",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.4.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.40.h5.gz",
+      "compressed_bytes": 1288669131,
+      "md5": "39cf7b6e86cb1c280df6fe76423db1d1",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.40.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.41.h5.gz",
+      "compressed_bytes": 1291509960,
+      "md5": "a77c46f659002a38e55413902216b648",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.41.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.42.h5.gz",
+      "compressed_bytes": 2956861724,
+      "md5": "1c6922d3fe8bc99250a2a70fba83de78",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.42.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.43.h5.gz",
+      "compressed_bytes": 1753522346,
+      "md5": "77bbda8a055e34324c9bb52db1ea5d5c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.43.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.44.h5.gz",
+      "compressed_bytes": 3081258551,
+      "md5": "45ff8b6fd2c004f91c26f961e2fabde2",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.44.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.45.h5.gz",
+      "compressed_bytes": 1519489132,
+      "md5": "8455d77b84f5e141d1be42824411f83f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.45.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.46.h5.gz",
+      "compressed_bytes": 1546965116,
+      "md5": "4d7308c1c62303b1af3521504e025107",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.46.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.47.h5.gz",
+      "compressed_bytes": 1758201093,
+      "md5": "de6b58ba79cec6d9fc25954a82fa9c69",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.47.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.48.h5.gz",
+      "compressed_bytes": 1269570168,
+      "md5": "187752e3a9081d550e35c18b399302c2",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.48.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.49.h5.gz",
+      "compressed_bytes": 1710800744,
+      "md5": "58d7843d69fe3062ad0e8b196c5c1066",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.49.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.5.h5.gz",
+      "compressed_bytes": 1543772401,
+      "md5": "dcc27f2125dbfbe8721ccf2b42dbe93a",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.5.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.50.h5.gz",
+      "compressed_bytes": 1822579997,
+      "md5": "4d9b79206912df1f5fdca1c5a81603b2",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.50.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.51.h5.gz",
+      "compressed_bytes": 1208101708,
+      "md5": "c91c49d2de1f1d5756435c453c714e8d",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.51.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.52.h5.gz",
+      "compressed_bytes": 2376460262,
+      "md5": "f8945557494653cbd1ea3899d3a51e65",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.52.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.53.h5.gz",
+      "compressed_bytes": 2090475978,
+      "md5": "c274bb0e8d0463c2f800f839b04799a7",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.53.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.54.h5.gz",
+      "compressed_bytes": 3638428557,
+      "md5": "a33279d78f2d2be6110189a60d46fcb3",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.54.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.55.h5.gz",
+      "compressed_bytes": 3668545261,
+      "md5": "589daa1f95026a840c8e06b4bdbd30da",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.55.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.56.h5.gz",
+      "compressed_bytes": 1484093007,
+      "md5": "f657eb24535292a1d087f81ca650f484",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.56.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.57.h5.gz",
+      "compressed_bytes": 2042146058,
+      "md5": "79ab05cc29fffba6ceb75da10505cf2c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.57.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.58.h5.gz",
+      "compressed_bytes": 2484647303,
+      "md5": "40f0d401671bc4b740088a487e299634",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.58.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.59.h5.gz",
+      "compressed_bytes": 1322438445,
+      "md5": "789fca6c6636561c3b99b514055fccd0",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.59.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.6.h5.gz",
+      "compressed_bytes": 1646271491,
+      "md5": "42483cd0bf1134c25bd150ecbbb5fef8",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.6.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.60.h5.gz",
+      "compressed_bytes": 1803305870,
+      "md5": "b754590cd92b1a1494171d3d33a60725",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.60.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.61.h5.gz",
+      "compressed_bytes": 1329960682,
+      "md5": "778d3521dda1affd1d41c8ffcb5910aa",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.61.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.62.h5.gz",
+      "compressed_bytes": 1640058389,
+      "md5": "08185b21259826a300eca96448217699",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.62.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.63.h5.gz",
+      "compressed_bytes": 2444954436,
+      "md5": "fd3f4aefd87388a5ab15128b9ff2d6f0",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.63.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.64.h5.gz",
+      "compressed_bytes": 1962602388,
+      "md5": "85ec73977daa8aa9973e973c16a10471",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.64.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.65.h5.gz",
+      "compressed_bytes": 3937851595,
+      "md5": "38af4f6182da6d8d934c8009bc6ad992",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.65.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.66.h5.gz",
+      "compressed_bytes": 1538381271,
+      "md5": "afb101b43ac4adab530b8b87e120a414",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.66.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.67.h5.gz",
+      "compressed_bytes": 1779628661,
+      "md5": "a6b1d6ed677531c2ea4f224b7f047289",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.67.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.68.h5.gz",
+      "compressed_bytes": 2218553459,
+      "md5": "1f5fe2c8a3f9aecb32d03b80f4d2e616",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.68.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.69.h5.gz",
+      "compressed_bytes": 2277641555,
+      "md5": "3dd58e81b29695fa4ed8e0600dcacf90",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.69.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.7.h5.gz",
+      "compressed_bytes": 2849997298,
+      "md5": "99cbdbf8433fefce40d55d595480fbba",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.7.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.70.h5.gz",
+      "compressed_bytes": 2306827409,
+      "md5": "b57aae2c72b71baeabbdd0bc355b5a44",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.70.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.71.h5.gz",
+      "compressed_bytes": 2773504637,
+      "md5": "86bc5a6f020e748472192ad7face0940",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.71.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.72.h5.gz",
+      "compressed_bytes": 3224580719,
+      "md5": "93fecc9d5cebc3235e8f77adb0d82e25",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.72.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.73.h5.gz",
+      "compressed_bytes": 2063032679,
+      "md5": "692fecf6460f54d7f1dd7bb7cb20f2ba",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.73.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.74.h5.gz",
+      "compressed_bytes": 1920969402,
+      "md5": "adc14429cc1dfc7516b0eff6bbaeaae1",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.74.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.75.h5.gz",
+      "compressed_bytes": 1973954300,
+      "md5": "ec5b2caf63b67e98dcc1fce2f306f88b",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.75.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.76.h5.gz",
+      "compressed_bytes": 2111183496,
+      "md5": "401749d466b4a1f7662cc45b466683fe",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.76.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.77.h5.gz",
+      "compressed_bytes": 1912057674,
+      "md5": "27269f97c9306791a2abf29eeb31e221",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.77.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.78.h5.gz",
+      "compressed_bytes": 1483582282,
+      "md5": "5ef54d3a3fb7addeddaca417452926da",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.78.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.79.h5.gz",
+      "compressed_bytes": 2279505731,
+      "md5": "34ac28fcddea251bc79670a86870d6b0",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.79.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.8.h5.gz",
+      "compressed_bytes": 2748239944,
+      "md5": "f0fffa0700f22c8ccfc0ead613336e62",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.8.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.80.h5.gz",
+      "compressed_bytes": 1386498481,
+      "md5": "6f3e4c595192383cde263b90566cbdbc",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.80.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.81.h5.gz",
+      "compressed_bytes": 3638662792,
+      "md5": "6a1f47540e5c9e19173c4b2562e18924",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.81.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.82.h5.gz",
+      "compressed_bytes": 3311650875,
+      "md5": "a9583c52a6563de07571bbfef0d6765d",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.82.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.83.h5.gz",
+      "compressed_bytes": 1684305889,
+      "md5": "6c5f2c760bab631a90d728d8c56583ae",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.83.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.84.h5.gz",
+      "compressed_bytes": 2785466042,
+      "md5": "8851df4d1475057262f1810a7f99cc9e",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.84.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.85.h5.gz",
+      "compressed_bytes": 1645796590,
+      "md5": "3594dfff07d460f53acc8742fec16d04",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.85.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.86.h5.gz",
+      "compressed_bytes": 2575345956,
+      "md5": "1dd451f2702addcfe615200a1081d186",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.86.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.87.h5.gz",
+      "compressed_bytes": 1524550550,
+      "md5": "a99a1aad4653fc67794fdda01df17d0c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.87.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.88.h5.gz",
+      "compressed_bytes": 2263865265,
+      "md5": "b8442fd1fc6f90c863c80e2de3a1749f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.88.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.89.h5.gz",
+      "compressed_bytes": 1526342374,
+      "md5": "5a2d33ba6950ba1fbdb04c4304e2e7d8",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.89.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.9.h5.gz",
+      "compressed_bytes": 2002682274,
+      "md5": "628dc3228afb8c05564f90598b99b1ee",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.9.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.90.h5.gz",
+      "compressed_bytes": 1848390322,
+      "md5": "17eb4eb63da4ee559dcd6f7d0b391019",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.90.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.91.h5.gz",
+      "compressed_bytes": 2303836431,
+      "md5": "a0526e9b671295e136d2cd92d2f76446",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.91.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.92.h5.gz",
+      "compressed_bytes": 2117674010,
+      "md5": "36dce0877f9490d8a013883406803afc",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.92.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.93.h5.gz",
+      "compressed_bytes": 1805698207,
+      "md5": "0c64c68464acb630c834351f4408f972",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.93.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.94.h5.gz",
+      "compressed_bytes": 1825394009,
+      "md5": "1b0e8573e798b73e13fffc870484b5e9",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.94.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.95.h5.gz",
+      "compressed_bytes": 1495218720,
+      "md5": "583aecc129c12c679a8c6f8e6cb4eb8c",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.95.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.96.h5.gz",
+      "compressed_bytes": 1294028929,
+      "md5": "f53057d0ea244debc16b1af7bc097b2f",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.96.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.97.h5.gz",
+      "compressed_bytes": 2543944277,
+      "md5": "645c9e0748cf0a1fcae6c0b90a9ed0ce",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.97.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.98.h5.gz",
+      "compressed_bytes": 1873057448,
+      "md5": "c203334557b4598477e9204971b3e9b9",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.98.h5.gz"
+    },
+    {
+      "file": "dfam40.uncurated.hmm.99.h5.gz",
+      "compressed_bytes": 2674671752,
+      "md5": "6e83ce3779b1606b48de39e01fd17606",
+      "url": "https://www.dfam.org/releases/Dfam_4.0/families/FamDB/dfam40.uncurated.hmm.99.h5.gz"
+    }
+  ]
+}

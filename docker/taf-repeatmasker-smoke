@@ -1,0 +1,177 @@
+#!/bin/sh
+set -eu
+stage=${1:-all}
+work=$(mktemp -d /tmp/taf-repeatmasker-smoke.XXXXXXXX)
+finish() { rc=$?; if [ "$rc" -ne 0 ]; then printf 'FAIL stage=%s exit=%s\n' "$stage" "$rc" >&2; for f in "$work"/*.log; do [ ! -f "$f" ] || tail -n 80 "$f" >&2; done; fi; rm -rf "$work"; exit "$rc"; }
+trap finish EXIT
+cd "$work"
+case "$stage" in
+ identity)
+  RepeatMasker -v >version.log 2>&1
+  grep -F 'RepeatMasker version 4.2.5' version.log
+  rmblastn -version >rmblast.log 2>&1
+  grep -F 'rmblastn: 2.17.1+' rmblast.log
+  blastx -version >blastx.log 2>&1
+  grep -F 'blastx: 2.17.1+' blastx.log
+  python3 -c 'import h5py,pandas'
+  test "$BLAST_USAGE_REPORT" = false
+  test "$PYTHONDONTWRITEBYTECODE" = 1
+  ;;
+ help)
+  RepeatMasker --help >help.log 2>&1
+  grep -F -- '-lib' help.log >/dev/null
+  ProcessRepeats -help >process.log 2>&1
+  famdb.py --help >famdb.log 2>&1
+  grep -F '3.0.0' famdb.log
+  RM2Bed.py --help >bed.log 2>&1
+  taf-repeatmasker-dfam --help >resource.log
+  taf-repeatmasker-landscape --help >landscape.log
+  ;;
+ resource)
+  taf-repeatmasker-dfam install --db-root "$work/db" --part curated.consensus.0 --dry-run >plan.log
+  grep -F 'dfam40.curated.consensus.0.h5.gz' plan.log
+  test ! -e "$work/db"
+  if taf-repeatmasker-dfam install --db-root "$work/db" --part all --dry-run >bad.log 2>&1; then exit 1; fi
+  grep -F 'unknown partition' bad.log
+  if taf-repeatmasker-dfam verify --db-root "$work/missing" >missing.log 2>&1; then exit 1; fi
+  grep -F 'missing' missing.log
+  if famdb.py -i /opt/RepeatMasker/Libraries/famdb info >empty.log 2>&1; then exit 1; fi
+  grep -F 'No .h5 files found' empty.log
+  ;;
+ tiny|utilities|reports|ucsc)
+  mkdir out
+  printf '>ToyRepeat#DNA/hAT\nACGTTGCATGTCAGTACGATCGTACGATGCTAGCTAGGATCCGATCGT\n' >repeats.fa
+  printf '>seq1\nNNNNNACGTTGCATGTCAGTACGATCGTACGATGCTAGCTAGGATCCGATCGTNNNNN\n' >input.fa
+  RepeatMasker -pa 1 -engine rmblast -lib repeats.fa -gff -a -dir out input.fa >run.log 2>&1
+  grep -F 'ToyRepeat' out/input.fa.out
+  test -s out/input.fa.masked
+  grep -F 'Motif:ToyRepeat' out/input.fa.out.gff
+  if [ "$stage" = utilities ]; then
+   RM2Bed.py out/input.fa.out out/input.bed >bed.log 2>&1
+   test -s out/input.bed
+   rmOutToGFF3.pl out/input.fa.out >out/converted.gff
+   grep -F 'ToyRepeat' out/converted.gff
+   buildSummary.pl out/input.fa.out >summary.log 2>&1
+   grep -F 'ToyRepeat' summary.log
+   calcDivergenceFromAlign.pl -s out/input.divsum out/input.fa.align >divergence.log 2>&1
+   test -s out/input.divsum
+   createRepeatLandscape.pl -div out/input.divsum -g 55 >out/online.html
+   grep -F 'google.com/jsapi' out/online.html
+  fi
+  if [ "$stage" = reports ]; then
+   RepeatMasker -pa 1 -engine rmblast -lib repeats.fa -html -a -dir out input.fa >html.log 2>&1
+   grep -F 'data:image/jpeg;base64,' out/input.fa.out.html >/dev/null
+   grep -F 'ToyRepeat' out/input.fa.out.html >/dev/null
+   grep -F 'hsps1' out/input.fa.out.html >/dev/null
+   calcDivergenceFromAlign.pl -s out/input.divsum out/input.fa.align >divergence.log 2>&1
+   taf-repeatmasker-landscape --div out/input.divsum --genome-size 58 --title 'Tiny repeat landscape' --output 'out/offline report.html' >offline.log
+   python3 - 'out/offline report.html' <<'PY'
+import json, re, sys
+from pathlib import Path
+text = Path(sys.argv[1]).read_text()
+data = json.loads(re.search(r'<script id="landscape-data" type="application/json">(.*?)</script>', text).group(1))
+assert data['classes'] == ['DNA/hAT'] and data['class_bp'] == [48]
+assert data['bins'][0] == [0, 48] and len(data['bins']) == 71
+assert data['title'] == 'Tiny repeat landscape' and data['genome_size'] == 58
+assert not re.search(r'(?:src|href)\s*=\s*[\x22\x27]https?://', text)
+PY
+   if taf-repeatmasker-landscape --div out/input.divsum --genome-size 58 --output 'out/offline report.html' >overwrite.log 2>&1; then exit 1; fi
+   grep -F 'output exists' overwrite.log
+   taf-repeatmasker-landscape --div out/input.divsum --genome-size 58 --output 'out/offline report.html' --force >force.log
+   if taf-repeatmasker-landscape --div missing --genome-size 58 --output out/missing.html >missing.log 2>&1; then exit 1; fi
+   test ! -e out/missing.html
+  fi
+  if [ "$stage" = ucsc ]; then
+   # 独立生成含 N 的 tiny 2bit，不额外依赖 faToTwoBit 或生产基因组。
+   python3 - <<'PY'
+import re, struct
+from pathlib import Path
+lines = Path('input.fa').read_text().splitlines()
+name = lines[0][1:].encode('ascii')
+sequence = ''.join(lines[1:])
+assert len(sequence) == 58 and sequence.count('N') == 10
+n_blocks = [(m.start(), m.end() - m.start()) for m in re.finditer('N+', sequence)]
+packed = bytearray((len(sequence) + 3) // 4)
+for i, base in enumerate(sequence):
+    packed[i // 4] |= {'T': 0, 'C': 1, 'A': 2, 'G': 3, 'N': 0}[base] << (6 - 2 * (i % 4))
+header = struct.pack('>IIII', 0x1A412743, 0, 1, 0)
+index = struct.pack('>B', len(name)) + name + struct.pack('>I', 16 + 1 + len(name) + 4)
+record = struct.pack('>II', len(sequence), len(n_blocks))
+record += b''.join(struct.pack('>I', start) for start, size in n_blocks)
+record += b''.join(struct.pack('>I', size) for start, size in n_blocks)
+record += struct.pack('>II', 0, 0) + packed
+Path('input.2bit').write_bytes(header + index + record)
+PY
+   twoBitInfo input.2bit chrom.sizes >twobit.log 2>&1
+   twoBitInfo -noNs input.2bit noNs.sizes >>twobit.log 2>&1
+   python3 - <<'PY'
+from pathlib import Path
+assert Path('chrom.sizes').read_text().split() == ['seq1', '58']
+assert Path('noNs.sizes').read_text().split() == ['seq1', '48']
+PY
+   calcDivergenceFromAlign.pl -s out/input.divsum out/input.fa.align >divergence.log 2>&1
+   createRepeatLandscape.pl -div out/input.divsum -twoBit input.2bit >out/twobit.html 2>landscape.log
+   createRepeatLandscape.pl -div out/input.divsum -g 48 >out/explicit.html 2>>landscape.log
+   python3 - <<'PY'
+from pathlib import Path
+text = Path('out/twobit.html').read_text()
+assert text == Path('out/explicit.html').read_text(), 'twoBit landscape differs from non-N genome size'
+assert "['DNA/hAT', 48]" in text and "['Unmasked',0]" in text
+PY
+   # 上游 system() 未检查 bedToBigBed 返回值，必须验证两类真实二进制产物。
+   rmToTrackHub.pl -hubname tracks -genome tiny -chromsizes chrom.sizes \
+    -out out/input.fa.out -align out/input.fa.align >trackhub.log 2>&1
+   python3 - <<'PY'
+import struct, zlib
+from pathlib import Path
+for filename, tsv, fields, defined in [
+    ('input.fa.out.bb', 'input.fa.join.tsv', 14, 9),
+    ('input.fa.align.bb', 'input.fa.align.tsv', 17, 3),
+]:
+    rows = Path(tsv).read_text().splitlines()
+    assert len(rows) == 1, (tsv, 'single source record')
+    row = rows[0].split('\t')
+    assert len(row) == fields and row[0] == 'seq1', (tsv, 'source BED fields')
+    if defined == 9:
+        # bigRmsk 的展示范围可扩展到比对之外；thickStart/End 才是实际命中。
+        assert 0 <= int(row[1]) <= 5 and 53 <= int(row[2]) <= 58, (tsv, 'display bounds')
+        assert row[3] == 'ToyRepeat#DNA/hAT' and row[5:8] == ['+', '5', '53'], (tsv, 'repeat hit')
+        assert row[12] == '1', (tsv, 'repeat ID')
+    else:
+        assert row[1:4] == ['5', '53', '5'] and row[8:12] == ['+', 'ToyRepeat', 'DNA', 'hAT'], (tsv, 'alignment hit')
+        assert row[12:16] == ['1', '48', '0', '1'] and row[16], (tsv, 'alignment repeat fields')
+    data = Path('tracks', filename).read_bytes()
+    assert len(data) > 64, (filename, 'empty or truncated bigBed')
+    byteorder = '<' if data[:4] == struct.pack('<I', 0x8789F2EB) else '>'
+    header = struct.unpack_from(byteorder + 'IHHQQQHHQQIQ', data)
+    assert header[0] == 0x8789F2EB and data[-4:] == data[:4], (filename, 'bigBed signature')
+    chrom_offset, data_offset, index_offset = header[3:6]
+    assert 64 <= chrom_offset < data_offset < index_offset < len(data), (filename, 'bigBed offsets')
+    assert header[6:8] == (fields, defined), (filename, 'BED field counts')
+    assert struct.unpack_from(byteorder + 'Q', data, data_offset)[0] == 1, (filename, 'item count')
+    payload = data[data_offset + 8:index_offset]
+    if header[10]:
+        payload = zlib.decompress(payload)
+    assert struct.unpack_from(byteorder + 'III', payload) == (0, int(row[1]), int(row[2])), (filename, 'TSV coordinates')
+    assert payload.endswith(b'\0') and payload.count(b'\0', 12) == 1, (filename, 'single BED record')
+    extra = payload[12:-1].split(b'\t')
+    assert extra == [field.encode('ascii') for field in row[3:]], (filename, 'TSV field round-trip')
+track = Path('tracks/trackDB.txt').read_text()
+assert 'bigDataUrl input.fa.out.bb' in track and 'xrefDataUrl input.fa.align.bb' in track
+PY
+  fi
+  ;;
+ engines)
+  trf -v >trf.log 2>&1 || trf_rc=$?
+  grep -F 'Tandem Repeats Finder, Version 4.09' trf.log
+  nhmmer -h >hmmer.log 2>&1
+  grep -F HMMER hmmer.log
+  twoBitInfo >ucsc.log 2>&1 || ucsc_rc=$?
+  grep -F twoBitInfo ucsc.log
+  bedToBigBed >bigbed.log 2>&1 || bigbed_rc=$?
+  grep -F bedToBigBed bigbed.log
+  ;;
+ all) for s in identity help resource tiny utilities engines reports ucsc; do taf-repeatmasker-smoke "$s"; done ;;
+ *) printf 'unknown smoke stage: %s\n' "$stage" >&2; exit 2 ;;
+esac
+printf 'PASS %s\n' "$stage"

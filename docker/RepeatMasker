@@ -1,0 +1,14 @@
+#!/bin/sh
+# Environment initialization only; never configure or write the install tree.
+set -eu
+taf_rm_root=/opt/RepeatMasker/Libraries/famdb
+if [ -n "${FAMDB_DIR:-}" ]; then
+    : # Explicit upstream configuration remains available to advanced users.
+elif [ -e "$taf_rm_root/taffish-famdb.ready" ]; then
+    taf-repeatmasker-dfam verify --quick --db-root "$taf_rm_root" >/dev/null
+    export FAMDB_DIR=/opt/FamDB
+elif [ -n "$(ls -A "$taf_rm_root")" ]; then
+    printf '%s\n' 'RepeatMasker: unprepared FamDB root; use taf-repeatmasker-dfam install in a new empty directory, or set TAFFISH_REPEATMASKER_AUTO_MOUNT=0 for -lib.' >&2
+    exit 1
+fi
+exec /opt/RepeatMasker/RepeatMasker "$@"

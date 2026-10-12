@@ -1,238 +1,75 @@
-ARG REPEATMASKER_VERSION=4.2.4
-ARG REPEATMASKER_ARCHIVE=RepeatMasker-4.2.4.tar.gz
-ARG REPEATMASKER_SHA256=7407b42909c64b7ae080efb737f3f725327be81ace1ec0cd9dc13c4a503885d7
-ARG FAMDB_VERSION=3.0.0
-ARG FAMDB_ARCHIVE=FamDB-3.0.0.tar.gz
-ARG FAMDB_SHA256=cad4652696cbd6b3444ef1ea008764e4807eba503410bf24357c4505a5ddb8d4
-ARG RMBLAST_VERSION=2.17.1
-ARG RMBLAST_IMAGE=ghcr.io/taffish/rmblast:2.17.1-r1
-ARG DEBIAN_MIRROR=http://deb.debian.org/debian
-ARG DEBIAN_SECURITY_MIRROR=http://deb.debian.org/debian-security
-
-FROM debian:12-slim AS fetcher
-
-ARG REPEATMASKER_ARCHIVE
-ARG REPEATMASKER_SHA256
-ARG FAMDB_VERSION
-ARG FAMDB_ARCHIVE
-ARG FAMDB_SHA256
-ARG DEBIAN_MIRROR
-ARG DEBIAN_SECURITY_MIRROR
-ARG TARGETARCH=amd64
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-RUN set -eux; \
-    case "${TARGETARCH}" in \
-      amd64|"") ;; \
-      *) echo "RepeatMasker app uses the official x86_64 RMBlast binary; unsupported TARGETARCH=${TARGETARCH}" >&2; exit 1 ;; \
-    esac; \
-    sed -i \
-      -e "s|http://deb.debian.org/debian-security|${DEBIAN_SECURITY_MIRROR}|g" \
-      -e "s|http://deb.debian.org/debian|${DEBIAN_MIRROR}|g" \
-      /etc/apt/sources.list.d/debian.sources; \
-    for attempt in 1 2 3 4 5 6; do \
-      if apt-get -o Acquire::Retries=3 update \
-       && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
-            ca-certificates \
-            curl \
-            gzip \
-            tar; then \
-        break; \
-      fi; \
-      if [ "$attempt" = "6" ]; then exit 1; fi; \
-      apt-get clean; \
-      rm -rf /var/lib/apt/lists/*; \
-      sleep 5; \
-    done; \
-    rm -rf /var/lib/apt/lists/*
-
+ARG DEBIAN_IMAGE=debian:12-slim@sha256:a4672c0cb26fbdde88e38fa2dfb6c681942306680e41e4378b28770b6e79ee91
+ARG RMBLAST_IMAGE=ghcr.io/taffish/rmblast:2.17.1-r1@sha256:3f39ff327be4108bc35611f6c620208d4155bf6058650e94f18478f353d0b4c1
+# 构建来源维护：两个 image digest 固定身份，不保证 registry 永久保留；拉取失败先核对 amd64 与仓库。
+# 不去掉 digest 或偷偷改用新镜像；实际材料变更须在候选中重验，已发布身份通过后继 release 修复。
+FROM ${DEBIAN_IMAGE} AS fetcher
+ARG TARGETARCH
+# fetcher/final 的 APT 仍依赖活动 Debian 仓库；镜像 digest 不锁定后续包，重试不能恢复已下架材料。
+RUN test "${TARGETARCH}" = amd64 && apt-get -o Acquire::Retries=3 update \
+ && apt-get -o Acquire::Retries=3 install -y --no-install-recommends ca-certificates curl gzip tar \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /tmp/build
-
-RUN set -eux; \
-    for item in \
-      "https://www.repeatmasker.org/RepeatMasker/${REPEATMASKER_ARCHIVE}|${REPEATMASKER_ARCHIVE}|${REPEATMASKER_SHA256}" \
-      "https://github.com/Dfam-consortium/FamDB/archive/refs/tags/${FAMDB_VERSION}.tar.gz|${FAMDB_ARCHIVE}|${FAMDB_SHA256}"; do \
-      url="$(printf '%s' "$item" | cut -d '|' -f 1)"; \
-      archive="$(printf '%s' "$item" | cut -d '|' -f 2)"; \
-      sha256="$(printf '%s' "$item" | cut -d '|' -f 3)"; \
-      for attempt in 1 2 3 4 5 6; do \
-        if curl \
-            --fail \
-            --location \
-            --show-error \
-            --connect-timeout 30 \
-            --retry 3 \
-            --retry-delay 5 \
-            --retry-all-errors \
-            -o "$archive" \
-            "$url"; then \
-          break; \
-        fi; \
-        if [ "$attempt" = "6" ]; then exit 1; fi; \
-        sleep 10; \
-      done; \
-      echo "${sha256}  ${archive}" | sha256sum -c -; \
-    done; \
-    mkdir -p /opt/RepeatMasker; \
-    tar -xzf "${REPEATMASKER_ARCHIVE}" -C /opt/RepeatMasker --strip-components=1; \
-    test -x /opt/RepeatMasker/RepeatMasker; \
-    test -x /opt/RepeatMasker/configure; \
-    test -r /opt/RepeatMasker/LICENSE; \
-    mkdir -p /opt/FamDB /opt/RepeatMasker/Libraries/famdb; \
-    tar -xzf "${FAMDB_ARCHIVE}" -C /opt/FamDB --strip-components=1; \
+# RepeatMasker/FamDB tag 归档有固定 SHA256；404/不匹配先检查官方来源、文件类型及下载完整性。
+# UCSC 两个工具采用官方一次性冻结的 linux.x86_64.v479，不使用无版本滚动目录。
+# 冻结说明：https://groups.google.com/a/soe.ucsc.edu/g/genome-mirror/c/7knco87cYd8
+# URL 固定版本，SHA256 固定字节；这不保证上游永久托管，也不代表整套 APT 依赖已锁定。
+# 404/校验失败先核对官方来源与完整下载；不得退回 rolling、删校验或仅重算哈希。
+# 旧材料不可得须如实记录；更换官方冻结版本或固定 Kent commit 源码构建后，重验
+# twoBitInfo -noNs 和 rmToTrackHub 的两类 bigBed；已发布身份通过后继 release 修复。
+RUN set -eu; \
+    curl -fL --retry 3 --retry-all-errors https://codeload.github.com/Dfam-consortium/RepeatMasker/tar.gz/refs/tags/v4.2.5 -o repeatmasker.tar.gz; \
+    echo '2a863a62c01d631f733ee0e9d01278241a96dfc168dc8eb974c43a44bcf1d570  repeatmasker.tar.gz' | sha256sum -c -; \
+    curl -fL --retry 3 --retry-all-errors https://codeload.github.com/Dfam-consortium/FamDB/tar.gz/refs/tags/3.0.0 -o famdb.tar.gz; \
+    echo 'cad4652696cbd6b3444ef1ea008764e4807eba503410bf24357c4505a5ddb8d4  famdb.tar.gz' | sha256sum -c -; \
+    mkdir -p /opt/RepeatMasker/Libraries/famdb /opt/FamDB /opt/ucsc/bin; \
+    tar -xzf repeatmasker.tar.gz -C /opt/RepeatMasker --strip-components=1; \
+    tar -xzf famdb.tar.gz -C /opt/FamDB --strip-components=1; \
     sed -i 's|# FAMDB_DATA_DIR = /path/to/famdb/directory|FAMDB_DATA_DIR = /opt/RepeatMasker/Libraries/famdb|' /opt/FamDB/famdb.conf; \
-    chmod -R a+rX /opt/FamDB; \
-    test -x /opt/FamDB/famdb.py; \
-    test -x /opt/FamDB/utils/download_dfam.py; \
-    grep -F "FAMDB_DATA_DIR = /opt/RepeatMasker/Libraries/famdb" /opt/FamDB/famdb.conf >/dev/null
-
-ARG UCSC_TOOLS_BASE=http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64
-ARG TWOBITINFO_SHA256=fca5427e1aedd00be0d32117420010c9162d442562c83305b2d3e3c8e6cebe71
-ARG BEDTOBIGBED_SHA256=73e10feef3a685304d71c840058ae9a5113bdc4e134f161d3913cfebc5a2ec24
-
-RUN set -eux; \
-    mkdir -p /opt/ucsc/bin; \
-    for item in \
-      "${UCSC_TOOLS_BASE}/twoBitInfo|twoBitInfo|${TWOBITINFO_SHA256}" \
-      "${UCSC_TOOLS_BASE}/bedToBigBed|bedToBigBed|${BEDTOBIGBED_SHA256}"; do \
-      url="$(printf '%s' "$item" | cut -d '|' -f 1)"; \
-      tool="$(printf '%s' "$item" | cut -d '|' -f 2)"; \
-      sha256="$(printf '%s' "$item" | cut -d '|' -f 3)"; \
-      for attempt in 1 2 3 4 5 6; do \
-        if curl \
-            --fail \
-            --location \
-            --show-error \
-            --connect-timeout 30 \
-            --retry 3 \
-            --retry-delay 5 \
-            --retry-all-errors \
-            -o "$tool" \
-            "$url"; then \
-          break; \
-        fi; \
-        if [ "$attempt" = "6" ]; then exit 1; fi; \
-        sleep 10; \
-      done; \
-      echo "${sha256}  ${tool}" | sha256sum -c -; \
-      install -m 0755 "$tool" "/opt/ucsc/bin/$tool"; \
-    done; \
-    test -x /opt/ucsc/bin/twoBitInfo; \
-    test -x /opt/ucsc/bin/bedToBigBed
-
+    curl -fL --retry 3 --retry-all-errors https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64.v479/twoBitInfo -o /opt/ucsc/bin/twoBitInfo; \
+    echo '406001e3f150f2caecf4846a1fd287341bda0303113641a3a6f5719bab435996  /opt/ucsc/bin/twoBitInfo' | sha256sum -c -; \
+    curl -fL --retry 3 --retry-all-errors https://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64.v479/bedToBigBed -o /opt/ucsc/bin/bedToBigBed; \
+    echo 'aa42073701d102b7eb5f7e6fe3c8f8057e5f983fb9967a9e501f044eb14c99f0  /opt/ucsc/bin/bedToBigBed' | sha256sum -c -; \
+    chmod 0755 /opt/ucsc/bin/*; chmod -R a+rX /opt/RepeatMasker /opt/FamDB
 FROM ${RMBLAST_IMAGE} AS rmblast
-
-FROM debian:12-slim
-
+FROM ${DEBIAN_IMAGE}
 LABEL maintainer="taffish@163.com"
-
-ARG REPEATMASKER_VERSION
-ARG FAMDB_VERSION
-ARG RMBLAST_VERSION
-ARG DEBIAN_MIRROR
-ARG DEBIAN_SECURITY_MIRROR
-
 ENV DEBIAN_FRONTEND=noninteractive
-
-RUN set -eux; \
-    sed -i \
-      -e "s|http://deb.debian.org/debian-security|${DEBIAN_SECURITY_MIRROR}|g" \
-      -e "s|http://deb.debian.org/debian|${DEBIAN_MIRROR}|g" \
-      /etc/apt/sources.list.d/debian.sources; \
-    for attempt in 1 2 3 4 5 6; do \
-      if apt-get -o Acquire::Retries=3 update \
-       && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
-            ca-certificates \
-            curl \
-            gzip \
-            hmmer \
-            libbz2-1.0 \
-            libgomp1 \
-            libsqlite3-0 \
-            libstdc++6 \
-            libzstd1 \
-            perl \
-            perl-doc \
-            python3 \
-            python3-h5py \
-            tar \
-            trf \
-            zlib1g; then \
-        break; \
-      fi; \
-      if [ "$attempt" = "6" ]; then exit 1; fi; \
-      apt-get clean; \
-      rm -rf /var/lib/apt/lists/*; \
-      sleep 5; \
-    done; \
-    rm -rf /var/lib/apt/lists/*
-
+# hmmer/trf/Perl/Python 等运行依赖未完整锁定；debian-packages.tsv 是事后清单，不是安装输入 lock。
+# 缺包先核对仓库分支/包身份；换用同版本可信材料或核验快照，若升级则重验 RepeatMasker 各引擎与离线路径。
+RUN apt-get -o Acquire::Retries=3 update \
+ && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
+    ca-certificates curl gzip hmmer libbz2-1.0 libgomp1 libsqlite3-0 libstdc++6 \
+    libzstd1 perl perl-doc python3 python3-h5py python3-pandas tar trf zlib1g \
+ && mkdir -p /usr/share/taffish-repeatmasker \
+ && dpkg-query -W > /usr/share/taffish-repeatmasker/debian-packages.tsv \
+ && apt-get clean && rm -rf /var/lib/apt/lists/* \
+ && find /usr/lib/python3 /usr/lib/python3.11 -type d -name __pycache__ -prune -exec rm -rf '{}' +
 COPY --from=fetcher /opt/RepeatMasker /opt/RepeatMasker
 COPY --from=fetcher /opt/FamDB /opt/FamDB
-COPY --from=rmblast /opt/rmblast /opt/rmblast
 COPY --from=fetcher /opt/ucsc /opt/ucsc
-
-ENV PATH=/opt/RepeatMasker:/opt/RepeatMasker/util:/opt/FamDB:/opt/FamDB/utils:/opt/rmblast/bin:/opt/ucsc/bin:${PATH}
-ENV BLAST_USAGE_REPORT=false
-ENV PAGER=cat
-ENV REPEATMASKER_LIB_DIR=/opt/RepeatMasker/Libraries
-
-RUN set -eux; \
-    printf '%s\n' \
-      '#!/bin/sh' \
-      'set -eu' \
-      'taf_famdb_data_dir=/opt/RepeatMasker/Libraries/famdb' \
-      'taf_famdb_configured=/opt/RepeatMasker/.taf-famdb-configured' \
-      'taf_has_famdb=0' \
-      'for taf_h5 in "$taf_famdb_data_dir"/*.h5; do' \
-      '  if [ -e "$taf_h5" ]; then taf_has_famdb=1; break; fi' \
-      'done' \
-      'if [ "$taf_has_famdb" = 1 ] && [ ! -e "$taf_famdb_configured" ]; then' \
-      '  cd /opt/RepeatMasker' \
-      '  TERM=dumb perl ./configure -trf_prgm /usr/bin/trf -rmblast_dir /opt/rmblast/bin -hmmer_dir /usr/bin -famdb_dir /opt/FamDB -default_search_engine rmblast >/tmp/taf-repeatmasker-configure.log 2>&1 || { cat /tmp/taf-repeatmasker-configure.log >&2; exit 1; }' \
-      '  touch "$taf_famdb_configured"' \
-      'fi' \
-      'exec RepeatMasker "$@"' \
-      > /usr/local/bin/taf-repeatmasker-entrypoint; \
-    chmod 0755 /usr/local/bin/taf-repeatmasker-entrypoint
-
-RUN set -eux; \
+COPY --from=rmblast /opt/rmblast /opt/rmblast
+COPY docker/kent-LICENSE /opt/ucsc/LICENSE
+COPY docker/dfam-4.0.catalog.json /opt/taffish-repeatmasker/dfam-4.0.catalog.json
+COPY docker/patch-cache.py /opt/taffish-repeatmasker/patch-cache.py
+COPY docker/patch-html.py /opt/taffish-repeatmasker/patch-html.py
+COPY docker/landscape.html /opt/taffish-repeatmasker/landscape.html
+COPY docker/taf-repeatmasker-landscape.py /usr/local/bin/taf-repeatmasker-landscape
+COPY docker/taf-repeatmasker-dfam.py /usr/local/bin/taf-repeatmasker-dfam
+COPY docker/RepeatMasker /usr/local/bin/RepeatMasker
+COPY docker/taf-repeatmasker-smoke /usr/local/bin/taf-repeatmasker-smoke
+ENV PATH=/usr/local/bin:/opt/RepeatMasker:/opt/RepeatMasker/util:/opt/FamDB:/opt/FamDB/utils:/opt/rmblast/bin:/opt/ucsc/bin:${PATH} \
+    BLAST_USAGE_REPORT=false PAGER=cat PYTHONDONTWRITEBYTECODE=1 \
+    REPEATMASKER_LIB_DIR=/opt/RepeatMasker/Libraries
+RUN set -eu; \
+    chmod 0755 /usr/local/bin/RepeatMasker /usr/local/bin/taf-repeatmasker-dfam /usr/local/bin/taf-repeatmasker-smoke /usr/local/bin/taf-repeatmasker-landscape; \
+    ln -s RepeatMasker /usr/local/bin/taf-repeatmasker-entrypoint; \
     cd /opt/RepeatMasker; \
-    TERM=dumb perl ./configure \
-      -trf_prgm /usr/bin/trf \
-      -rmblast_dir /opt/rmblast/bin \
-      -hmmer_dir /usr/bin \
-      -default_search_engine rmblast; \
-    RepeatMasker -v 2>&1 | grep -F "RepeatMasker version ${REPEATMASKER_VERSION}" >/dev/null; \
-    taf-repeatmasker-entrypoint -v 2>&1 | grep -F "RepeatMasker version ${REPEATMASKER_VERSION}" >/dev/null; \
-    RepeatMasker --help >/tmp/repeatmasker.help 2>&1; \
-    grep -F "RepeatMasker is a program that screens DNA sequences" /tmp/repeatmasker.help >/dev/null; \
-    rm -f /tmp/repeatmasker.help; \
-    rmblastn -version 2>&1 | grep -F "rmblastn: ${RMBLAST_VERSION}+" >/dev/null; \
-    trf -v 2>&1 | grep -F "Tandem Repeats Finder, Version 4.09" >/dev/null; \
-    nhmmer -h 2>&1 | grep -F "HMMER" >/dev/null; \
-    twoBitInfo 2>&1 | grep -F "twoBitInfo" >/dev/null; \
-    bedToBigBed 2>&1 | grep -F "bedToBigBed" >/dev/null; \
-    famdb.py --help 2>&1 | grep -F "This is famdb.py version ${FAMDB_VERSION}" >/dev/null; \
-    download_dfam.py --help 2>&1 | grep -F "Download, verify, and decompress FamDB component files from Dfam" >/dev/null; \
-    if famdb.py -i /opt/RepeatMasker/Libraries/famdb info >/tmp/famdb-empty.log 2>&1; then exit 1; fi; \
-    grep -F "No .h5 files found" /tmp/famdb-empty.log >/dev/null; \
-    grep -F "FAMDB_DATA_DIR = /opt/RepeatMasker/Libraries/famdb" /opt/FamDB/famdb.conf >/dev/null; \
-    grep -F "'FAMDB_DIR'" /opt/RepeatMasker/RepeatMaskerConfig.pm >/dev/null; \
-    if grep -F "/opt/FamDB" /opt/RepeatMasker/RepeatMaskerConfig.pm >/dev/null; then exit 1; fi; \
-    mkdir -p /tmp/repeatmasker-check/out; \
-    cd /tmp/repeatmasker-check; \
-    printf '>ToyRepeat#DNA/Toy\nACGTTGCATGTCAGTACGATCGTACGATGCTAGCTAGGATCCGATCGT\n' > repeats.fa; \
-    printf '>seq1\nNNNNNACGTTGCATGTCAGTACGATCGTACGATGCTAGCTAGGATCCGATCGTNNNNN\n' > input.fa; \
-    taf-repeatmasker-entrypoint -pa 1 -engine rmblast -lib repeats.fa -dir out input.fa >/tmp/repeatmasker-check/run.log 2>&1 || { cat /tmp/repeatmasker-check/run.log; exit 1; }; \
-    test -s out/input.fa.out; \
-    test -s out/input.fa.masked; \
-    grep -F "ToyRepeat" out/input.fa.out >/dev/null; \
-    grep -F "seq1" out/input.fa.masked >/dev/null; \
-    rm -rf /tmp/repeatmasker-check
-
-WORKDIR /root
-
-ENV TAFFISH_ENV=TAFFISH
-ENV TAFFISH_NAME=repeatmasker
+    TERM=dumb perl ./configure -trf_prgm /usr/bin/trf -rmblast_dir /opt/rmblast/bin -hmmer_dir /usr/bin -default_search_engine rmblast; \
+    python3 /opt/taffish-repeatmasker/patch-cache.py; \
+    python3 /opt/taffish-repeatmasker/patch-html.py; \
+    python3 -c 'import h5py, pandas'; \
+    taf-repeatmasker-smoke identity; taf-repeatmasker-smoke tiny
+# Keep upstream examples, runtime data, Perl POD and all license notices.
+# Debian-generated bytecode was removed in its installation layer above.
+WORKDIR /tmp
+ENV TAFFISH_ENV=TAFFISH TAFFISH_NAME=repeatmasker

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>@@TITLE@@</title>
+<style>
+:root{color-scheme:light;--ink:#172c38;--muted:#4c626e;--line:#d5e0e5;--accent:#126c82}
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+main{max-width:1240px;margin:36px auto;padding:0 28px}h1{font-size:clamp(26px,4vw,36px);line-height:1.2;margin:8px 0 14px;overflow-wrap:anywhere}
+h2{font-size:21px;line-height:1.35;margin:0 0 10px}p{margin:8px 0}.intro{max-width:85ch}.eyebrow{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:12px}
+.card{background:white;border:1px solid var(--line);border-radius:12px;padding:24px;margin:24px 0;min-width:0}
+.note{color:var(--muted);font-size:14px}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.metrics div{border-left:3px solid #b4d2d9;padding:4px 14px;min-width:0}.metrics dt{color:var(--muted);font-size:13px}.metrics dd{font-size:22px;font-weight:650;margin:3px 0 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.controls{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:20px 0 12px}.field{display:grid;gap:5px;min-width:0;flex:1 1 260px;max-width:460px}.field label{font-size:14px;font-weight:600}
+button,select{font:inherit;line-height:1.375;min-height:44px;padding:10px 12px;border:1px solid #839aa6;border-radius:6px;background:white;color:var(--ink);max-width:100%}
+.select-control{position:relative;display:block;min-width:0}.select-control::after{content:"";position:absolute;right:17px;top:50%;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+select{display:block;width:100%;appearance:none;-webkit-appearance:none;padding-right:44px;text-overflow:ellipsis;cursor:pointer}button{cursor:pointer}button:hover{background:#e6f3f5}button:focus-visible,select:focus-visible,.plot:focus-visible,.table-wrap:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.selection{margin:14px 0 6px;font-weight:600;overflow-wrap:anywhere}.plot{overflow-x:auto;overscroll-behavior-x:contain;border-radius:4px}svg{display:block;width:100%;height:auto;min-width:640px;font-family:system-ui,sans-serif}
+svg .bar{cursor:crosshair}svg .bar:hover,svg .bar:focus{stroke:#172c38;stroke-width:2;outline:none}
+.scroll-hint{font-size:13px;color:var(--muted);margin:0 0 12px}.legend{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:14px;margin:16px 0 0}.legend-item{display:flex;align-items:baseline;min-width:0;max-width:100%;overflow-wrap:anywhere}
+.swatch{display:inline-block;flex:none;width:12px;height:12px;margin-right:8px;border:1px solid #0002}#tooltip{background:#f1f6f8;border-left:3px solid #b4d2d9;border-radius:4px;padding:12px 14px;min-height:72px;margin-top:16px;overflow-wrap:anywhere;font-size:14px;font-variant-numeric:tabular-nums}
+#tooltip strong{display:block;margin-bottom:3px}.table-wrap{overflow-x:auto;max-height:560px;overscroll-behavior:contain}table{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}thead th{background:#edf4f6;position:sticky;top:0;font-weight:600}th:first-child,td:first-child{text-align:left;width:36%;min-width:180px;overflow-wrap:anywhere}td:not(:first-child){white-space:nowrap}tbody th{font-weight:400}
+tbody tr:hover{background:#f6fafb}.empty{padding:12px 16px;border:1px dashed #839aa6;background:#f6fafb;border-radius:6px}details{border-top:1px solid var(--line);padding-top:16px;margin-top:20px}summary{cursor:pointer;font-weight:600}details p{max-width:90ch}
+footer{margin:24px 0 36px}#source{overflow-wrap:anywhere}code{font:12px/1.6 ui-monospace,monospace;overflow-wrap:anywhere}noscript{display:block;color:#922;padding:16px;border:1px solid #922}
+@media(max-width:620px){main{margin:24px auto;padding:0 14px}.card{padding:16px;margin:18px 0}.metrics{gap:8px}.metrics div{padding:2px 8px}.metrics dd{font-size:18px}.controls{gap:10px}.field{flex-basis:100%;max-width:none}button{flex:1 1 180px;text-align:center}.legend{gap:8px 14px}}
+@media(forced-colors:active){select{appearance:auto;-webkit-appearance:auto;padding-right:12px}.select-control::after{display:none}}
+@media print{body{background:white}main{max-width:none;margin:0;padding:0}.card{border:0;padding:12px 0;margin:12px 0}.controls,.scroll-hint{display:none}.plot,.table-wrap{overflow:visible;max-height:none}svg{min-width:0}table{min-width:0}thead th{position:static}h1,h2{break-after:avoid}.metrics{break-inside:avoid}}
+</style></head><body><main>
+<div class="eyebrow">TAFFISH · REPEATMASKER · OFFLINE VIEWER</div><h1>@@TITLE@@</h1>
+<p class="intro note">An independent TAFFISH view of upstream calcDivergenceFromAlign.pl results. Raw class names and all supplied divergence bins are retained; this is not the original upstream landscape viewer.</p>
+<dl class="metrics"><div><dt>Raw classes</dt><dd id="class-count"></dd></div><div><dt>Divergence bins</dt><dd id="bin-count"></dd></div><div><dt>Supplied genome size</dt><dd id="genome-size"></dd></div></dl>
+<noscript>Enable JavaScript locally to display the chart and table. No network access is required.</noscript>
+<section class="card" aria-labelledby="landscape-heading"><h2 id="landscape-heading">Repeat landscape</h2>
+<p class="note">Each stacked bar shows bin coverage / supplied genome size × 100. Empty bins remain visible. The vertical scale stays fixed when filtering classes, so bar heights remain comparable.</p>
+<div class="controls"><div class="field"><label for="class-filter">Show class</label><span class="select-control"><select id="class-filter"><option value="all">All classes</option></select></span></div><button id="csv" type="button">Download all data (CSV)</button><button id="svg-download" type="button">Download current chart (SVG)</button></div>
+<p id="selection" class="selection" aria-live="polite"></p>
+<p class="scroll-hint">On a narrow screen, scroll inside the chart or table to see its full width.</p>
+<div class="plot" tabindex="0" role="region" aria-label="Repeat landscape chart, horizontally scrollable"><svg id="chart" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 424" role="group" aria-label="Repeat landscape histogram"></svg></div>
+<p id="empty" class="empty" hidden>No nonzero bin coverage for this selection. The summary table and CSV retain the supplied values.</p>
+<div id="legend" class="legend" aria-label="Class color legend"></div>
+<div id="tooltip" role="status" aria-live="polite">Hover, tap or keyboard-focus a colored bar to inspect its coverage.</div>
+<p class="note">The filter changes the chart, table and SVG; the CSV always contains every original class and bin. Display rounding does not change CSV values.</p>
+</section>
+<section class="card" aria-labelledby="summary-heading"><h2 id="summary-heading">Raw class summary</h2>
+<p class="note">Family absLen and divergence-bin coverage are separate upstream counts. The percentage below uses family absLen; the chart uses bin coverage.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Raw class summary, scrollable"><table><thead><tr><th scope="col">Raw class</th><th scope="col">Family absLen<br>(bp)</th><th scope="col">Bin coverage<br>(bp)</th><th scope="col">Family absLen /<br>genome (%)</th></tr></thead><tbody id="rows"></tbody></table></div>
+<details open><summary>How to interpret these values</summary><p class="note">absLen is summed from the family section; bin coverage is summed separately from the divergence section. These are upstream coverage counts, not a recomputed union of genomic intervals. They may differ and must not be interpreted as uniquely masked bases or an inferred unmasked fraction. The denominator is supplied by the user; record whether it includes Ns.</p></details></section>
+<footer class="note"><h2>Source and method</h2><p id="source"></p><p><code id="checksum"></code></p><p>No external scripts, fonts, service, login or telemetry. This helper does not modify RepeatMasker results or apply upstream class regrouping or fixed-class exclusion. The original createRepeatLandscape.pl remains available separately with its Google online runtime.</p></footer>
+</main><script id="landscape-data" type="application/json">@@DATA@@</script><script>
+'use strict';
+const D=JSON.parse(document.getElementById('landscape-data').textContent), NS='http://www.w3.org/2000/svg';
+const el=id=>document.getElementById(id), fmt=n=>n.toLocaleString('en-US',{maximumFractionDigits:6});
+const displayPercent=n=>n!==0&&Math.abs(n)<0.000001?n.toExponential(3):fmt(n);
+const colors=['#167d9a','#c66a25','#678940','#9163ad','#c34566','#327458','#8d713b','#4e67b0'];
+const color=i=>i<colors.length?colors[i]:`hsl(${(i*137.508)%360} 55% 38%)`;
+const classCoverage=D.classes.map((_,i)=>D.bins.reduce((s,row)=>s+row[i+1],0));
+const peak=D.bins.reduce((m,row)=>Math.max(m,row.slice(1).reduce((s,bp)=>s+bp,0)*100/D.genome_size),0);
+// Nice tick positions affect presentation only; no normalization or data rounding.
+function axis(peak){
+ const raw=(peak>0?peak*1.05:1)/4, power=10**Math.floor(Math.log10(raw)), fraction=raw/power;
+ const step=([1,2,2.5,5,10].find(n=>n>=fraction)||10)*power;
+ const count=Math.ceil((peak>0?peak*1.05:1)/step), max=count*step;
+ const digits=Math.max(0,-Math.floor(Math.log10(step))+1);
+ const format=n=>n===0?'0':(max<0.001||max>=1e6?n.toExponential(1):n.toLocaleString('en-US',{maximumFractionDigits:Math.min(6,digits)}));
+ return {max,ticks:Array.from({length:count+1},(_,i)=>({value:i*step,label:format(i*step)}))};
+}
+const scale=axis(peak);
+el('class-count').textContent=fmt(D.classes.length);el('bin-count').textContent=fmt(D.bins.length);el('genome-size').textContent=fmt(D.genome_size)+' bp';
+el('source').textContent=`Input: ${D.source}`;el('checksum').textContent=`Input SHA256: ${D.source_sha256}`;
+D.classes.forEach((name,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=name;el('class-filter').append(o);});
+function node(tag,attrs={},text){const n=document.createElementNS(NS,tag);for(const [k,v] of Object.entries(attrs))n.setAttribute(k,String(v));if(text!==undefined)n.textContent=text;return n;}
+function selectedIds(){const s=el('class-filter').value;return D.classes.map((_,i)=>i).filter(i=>s==='all'||String(i)===s);}
+function selectionText(ids){return el('class-filter').value==='all'?'All classes':D.classes[ids[0]];}
+function detail(i,row){
+ const bp=row[i+1], pct=bp*100/D.genome_size, title=document.createElement('strong');title.textContent=D.classes[i];
+ el('tooltip').replaceChildren(title,document.createTextNode(`Divergence bin ${row[0]} · ${fmt(bp)} bp · ${displayPercent(pct)}% of supplied genome`));
+}
+function buildChart(chart,width,ids,interactive){
+ const left=Math.max(70,Math.max(...scale.ticks.map(t=>t.label.length))*9+20), right=24, top=40, height=300, plotWidth=width-left-right;
+ chart.replaceChildren(node('title',{},D.title+' — '+selectionText(ids)),node('desc',{},'Raw bin coverage divided by the supplied genome size. All supplied bins are retained; the vertical scale is fixed across class filters.'));
+ chart.setAttribute('viewBox',`0 0 ${width} 424`);chart.setAttribute('font-family','system-ui, sans-serif');
+ chart.append(node('rect',{width,height:424,fill:'white'}));
+ chart.append(node('text',{x:left,y:20,fill:'#4c626e','font-size':13},'Coverage / supplied genome (%)'));
+ for(const tick of scale.ticks){const y=top+height-height*tick.value/scale.max;
+  chart.append(node('line',{x1:left,y1:y,x2:width-right,y2:y,stroke:'#d5e0e5'}),node('text',{x:left-12,y:y+5,'text-anchor':'end',fill:'#172c38','font-size':13},tick.label));
+ }
+ const labelSpace=Math.max(64,...D.bins.map(row=>String(row[0]).length*8+16));
+ const slot=plotWidth/D.bins.length, every=Math.max(1,Math.ceil(D.bins.length/Math.max(2,Math.floor(plotWidth/labelSpace))));
+ D.bins.forEach((row,k)=>{let base=0;ids.forEach(i=>{const bp=row[i+1];if(!bp)return;const h=(bp*100/D.genome_size)/scale.max*height;
+  const attrs={x:left+k*slot+slot*.08,y:top+height-base-h,width:slot*.84,height:h,fill:color(i)};
+  const message=`${D.classes[i]} · divergence ${row[0]} · ${fmt(bp)} bp · ${displayPercent(bp*100/D.genome_size)}% of supplied genome`;
+  if(interactive)Object.assign(attrs,{class:'bar',tabindex:0,role:'img','aria-label':message});
+  const r=node('rect',attrs);r.append(node('title',{},message));
+  if(interactive)for(const event of ['pointerenter','focus','click'])r.addEventListener(event,()=>detail(i,row));
+  chart.append(r);base+=h;
+ });
+ if(k%every===0||k===D.bins.length-1&&k%every>=every/2)chart.append(node('text',{x:left+(k+.5)*slot,y:366,'text-anchor':'middle',fill:'#172c38','font-size':13},row[0]));
+ });
+ chart.append(node('text',{x:left+plotWidth/2,y:405,'text-anchor':'middle',fill:'#172c38','font-size':14},'Kimura divergence bin (CpG adjusted)'));
+}
+function draw(){
+ const ids=selectedIds();el('rows').replaceChildren();el('legend').replaceChildren();
+ el('selection').textContent='Showing: '+selectionText(ids);el('tooltip').textContent='Hover, tap or keyboard-focus a colored bar to inspect its coverage.';
+ el('empty').hidden=ids.some(i=>classCoverage[i]>0);
+ buildChart(el('chart'),Math.max(640,Math.round(el('chart').parentElement.clientWidth)),ids,true);
+ ids.forEach(i=>{
+  const tr=document.createElement('tr');[D.classes[i],fmt(D.class_bp[i]),fmt(classCoverage[i]),displayPercent(D.class_bp[i]*100/D.genome_size)].forEach((v,j)=>{const td=document.createElement(j===0?'th':'td');if(j===0)td.scope='row';td.textContent=v;tr.append(td);});el('rows').append(tr);
+  const item=document.createElement('span'),swatch=document.createElement('span'),label=document.createElement('span');item.className='legend-item';swatch.className='swatch';swatch.style.background=color(i);swatch.setAttribute('aria-hidden','true');label.textContent=D.classes[i];item.append(swatch,label);el('legend').append(item);
+ });
+}
+function download(name,type,text){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+// Wrap SVG text using actual font metrics; long identifiers are never truncated.
+function wrappedText(parent,text,x,y,maxWidth,size=14,weight='400'){
+ const lineHeight=size*1.45, t=node('text',{x,y,fill:'#172c38','font-size':size,'font-weight':weight});parent.append(t);
+ let line=node('tspan',{x,dy:0});t.append(line);let count=1;
+ for(const char of text){line.textContent+=char;if(line.getComputedTextLength()>maxWidth&&line.textContent.length>1){line.textContent=line.textContent.slice(0,-char.length).trimEnd();line=node('tspan',{x,dy:lineHeight},char.trimStart());t.append(line);count++;}}
+ return y+count*lineHeight;
+}
+function exportChart(){
+ const ids=selectedIds(), svg=node('svg',{xmlns:NS,width:1000,'font-family':'system-ui, sans-serif',role:'img'});
+ // Temporarily attached only for font measurement. No external assets are needed.
+ svg.style.position='absolute';svg.style.left='-100000px';svg.style.width='1000px';document.body.append(svg);
+ try{
+  svg.append(node('title',{},D.title),node('desc',{},'TAFFISH independent offline RepeatMasker landscape, with raw classes and all supplied bins.'));
+  const background=node('rect',{width:1000,height:1000,fill:'white'});svg.append(background);
+  let y=wrappedText(svg,D.title,28,34,944,24,'600');
+  y=wrappedText(svg,'Showing: '+selectionText(ids),28,y+8,944);
+  y=wrappedText(svg,`Supplied genome size: ${fmt(D.genome_size)} bp · ${D.bins.length} bins · fixed vertical scale`,28,y+4,944,13);
+  const chart=node('g',{transform:`translate(0 ${y+6})`});svg.append(chart);buildChart(chart,1000,ids,false);y+=444;
+  if(!ids.some(i=>classCoverage[i]>0))y=wrappedText(svg,'No nonzero bin coverage for this selection.',28,y,944);
+  for(const i of ids){svg.append(node('rect',{x:28,y:y-11,width:12,height:12,fill:color(i)}));y=wrappedText(svg,D.classes[i],50,y,922)+5;}
+  y=wrappedText(svg,'Raw bin coverage / supplied genome size × 100; not unique masked fraction.',28,y+12,944,12);
+  y=wrappedText(svg,'Input: '+D.source,28,y+4,944,12);
+  y=wrappedText(svg,'SHA256: '+D.source_sha256,28,y+4,944,12);
+  y=wrappedText(svg,'TAFFISH independent viewer; no upstream class regrouping or fixed-class exclusion.',28,y+4,944,12);
+  const height=Math.ceil(y+20);svg.setAttribute('height',height);svg.setAttribute('viewBox',`0 0 1000 ${height}`);background.setAttribute('height',height);svg.removeAttribute('style');
+  return new XMLSerializer().serializeToString(svg);
+ }finally{svg.remove();}
+}
+el('class-filter').addEventListener('change',draw);
+el('csv').addEventListener('click',()=>{const quote=s=>'"'+String(s).replace(/^[=+@-]/,"'$&").replaceAll('"','""')+'"';const rows=['divergence,class,coverage_bp,genome_bp,percent_genome'];for(const row of D.bins)D.classes.forEach((name,i)=>rows.push([row[0],quote(name),row[i+1],D.genome_size,row[i+1]*100/D.genome_size].join(',')));download('repeat-landscape.csv','text/csv;charset=utf-8',rows.join('\r\n')+'\r\n');});
+el('svg-download').addEventListener('click',()=>download('repeat-landscape.svg','image/svg+xml',exportChart()));
+draw();
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(()=>buildChart(el('chart'),Math.max(640,Math.round(el('chart').parentElement.clientWidth)),selectedIds(),true)).observe(el('chart').parentElement);
+else window.addEventListener('resize',()=>buildChart(el('chart'),Math.max(640,Math.round(el('chart').parentElement.clientWidth)),selectedIds(),true));
+</script></body></html>

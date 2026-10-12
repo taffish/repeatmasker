@@ -1,115 +1,89 @@
-taf-repeatmasker 4.2.4-r1
+repeatmasker 4.2.5-r1
 
-RepeatMasker screens DNA FASTA sequences for interspersed repeats and
-low-complexity DNA. This app defaults to upstream RepeatMasker through a small
-entrypoint and includes RMBlast, TRF, HMMER, FamDB tools, UCSC helpers, and
-RepeatMasker utilities.
+Purpose:
+  Mask repeats in DNA FASTA using a custom library or prepared Dfam partitions.
 
 Usage:
-  taf-repeatmasker [-h | --help]
-  taf-repeatmasker [-v | --version]
-  taf-repeatmasker [REPEATMASKER_OPTIONS...] <seq.fa>
-  taf-repeatmasker -- [REPEATMASKER_ARGS...]
-  taf-repeatmasker COMMAND [ARGS...]
-  taf-repeatmasker --compile [ARGS...]
+  taf-repeatmasker [RepeatMasker options] genome.fa
+  taf-repeatmasker COMMAND [arguments]
+  taf-repeatmasker --help                 TAFFISH usage
+  taf-repeatmasker --version              Package version
+  taf-repeatmasker -- --help              Upstream options
+  taf-repeatmasker -- -v                  Upstream version
+  taf-repeatmasker --compile [arguments]  Show generated shell command
 
-Wrapper options:
-  -h, --help       Show this TAFFISH app help
-  -v, --version    Show TAFFISH package version
-  --compile        Print generated shell code instead of running it
-  --               Stop wrapper option parsing and pass following args to
-                   RepeatMasker
-
-Default upstream command:
-  taf-repeatmasker -- -help
-  taf-repeatmasker -- --help
-  taf-repeatmasker -- -v
-  taf-repeatmasker -pa 4 -engine rmblast -lib repeats.fa genome.fa
-
-Command mode:
-  taf-repeatmasker RepeatMasker -v
-  taf-repeatmasker famdb.py -i /opt/RepeatMasker/Libraries/famdb info
-  taf-repeatmasker rmOutToGFF3.pl genome.fa.out > genome.fa.out.gff
-  taf-repeatmasker buildSummary.pl genome.fa.out > genome.fa.tbl
-  taf-repeatmasker rmToTrackHub.pl -out genome.fa.out -genome hg38
-  taf-repeatmasker rmblastn -version
-  taf-repeatmasker trf -v
-  taf-repeatmasker famdb.py --help
-  taf-repeatmasker download_dfam.py --help
-
-Common custom-library workflow:
-  taf-repeatmasker -pa 8 -engine rmblast -lib repeats.fa -dir rm-out genome.fa
-
-Common Dfam/FamDB workflow:
-  taf-repeatmasker famdb.py -i /opt/RepeatMasker/Libraries/famdb info
-  taf-repeatmasker -pa 8 -engine rmblast -species "Homo sapiens" genome.fa
-
-Important data note:
-  RepeatMasker 4.2.4 no longer bundles Dfam data. This app packages FamDB
-  3.0.0 and configures FamDB itself to read Dfam component files from:
-    /opt/RepeatMasker/Libraries/famdb
-
-  Custom-library runs with -lib do not need Dfam data. To keep that mode
-  working, the static RepeatMasker config leaves FamDB disabled when no .h5
-  files are present. Species or clade runs with -species require Dfam 4.x
-  FamDB component files; when mounted .h5 files exist, the default entrypoint
-  enables FamDB before running RepeatMasker. The wrapper auto-mounts an
-  existing local directory when one of these paths exists:
-    TAFFISH_REPEATMASKER_FAMDB_PATH
-    ~/.local/share/taffish/databases/repeatmasker/dfam4
-    /usr/local/share/taffish/databases/repeatmasker/dfam4
-    /opt/taffish/databases/repeatmasker/dfam4
-
-  To prepare personal data, create and enter the database root, then run:
-    mkdir -p ~/.local/share/taffish/databases/repeatmasker/dfam4
-    cd ~/.local/share/taffish/databases/repeatmasker
-    taf-repeatmasker download_dfam.py -o "$PWD/dfam4"
-
-  RepBase is not included.
+Custom library (no Dfam download needed):
+  mkdir -p rm-out
+  taf-repeatmasker -pa 8 -engine rmblast -lib repeats.fa -a -gff \
+    -dir rm-out genome.fa
+  Use headers like >repeat_name#class/subclass in repeats.fa.
 
 Common options:
-  -pa INT            Parallel batch jobs
-  -engine NAME       rmblast, hmmer, crossmatch, wublast, abblast, or ncbi
-  -lib FILE          Use a custom repeat library FASTA
-  -species NAME      Use installed Dfam/RepBase libraries for a species/clade
-  -dir DIR           Write output files to DIR
-  -gff               Also write GFF output
-  -xsmall            Soft-mask repeats to lowercase
-  -nolow             Do not mask simple repeats/low complexity
-  -norna             Do not mask small RNA genes
-  -e VALUE           Search e-value cutoff
+  -pa N          Parallel jobs
+  -lib FILE      Custom repeat consensus FASTA
+  -species NAME  Species/clade in prepared Dfam data
+  -dir DIR       Writable output directory; prefer a new one for each run
+  -a -gff -html  Also produce alignments, GFF and offline alignment HTML
+  -xsmall        Soft-mask to lowercase
+  -nolow -norna  Skip low-complexity/small-RNA masking, respectively
 
-Packaged commands:
-  RepeatMasker, taf-repeatmasker-entrypoint, ProcessRepeats,
-  RepeatProteinMask, DupMasker, famdb.py, download_dfam.py, RM2Bed.py,
-  rmOutToGFF3.pl, buildSummary.pl, calcDivergenceFromAlign.pl,
-  createRepeatLandscape.pl, rmToTrackHub.pl, maskFile.pl,
-  buildRMLibFromEMBL.pl, rmblastn, makeblastdb, trf, nhmmer, hmmsearch,
-  twoBitInfo, bedToBigBed.
+Outputs and utilities:
+  .out annotations, .masked FASTA, .tbl summary, optional .align and .out.gff.
+  taf-repeatmasker RM2Bed.py rm-out/genome.fa.out rm-out/repeats.bed
+  taf-repeatmasker rmOutToGFF3.pl rm-out/genome.fa.out > rm-out/repeats.gff3
+  taf-repeatmasker calcDivergenceFromAlign.pl -s genome.divsum rm-out/genome.fa.align
+  taf-repeatmasker taf-repeatmasker-landscape --div genome.divsum \
+    --genome-size 3000000 --output landscape.html --title "'My repeat landscape'"
+  Open landscape.html or rm-out/genome.fa.out.html locally; no network is needed.
+  Alignment repeat-name links open the upstream website; HSP viewing stays offline.
+  Landscape: class filter, bar details, CSV (all data), SVG (current chart/legend).
+  Use your actual genome-size denominator; existing HTML needs explicit --force.
+  Original createRepeatLandscape.pl remains available but requires Google/network.
 
-Outputs:
-  Typical runs write .out repeat annotations, .masked FASTA, .tbl summaries,
-  optional .align alignments, .cat files, and optional .gff output.
+Prepare Dfam 4.0 (online, explicitly selected members):
+  mkdir -p "$HOME/.local/share/taffish/databases/repeatmasker"
+  cd "$HOME/.local/share/taffish/databases/repeatmasker"
+  export TAFFISH_REPEATMASKER_AUTO_MOUNT=0
+  taf-repeatmasker taf-repeatmasker-dfam list
+  taf-repeatmasker taf-repeatmasker-dfam install --db-root "$PWD/dfam4" \
+    --part curated.consensus.0 --dry-run
+  Repeat without --dry-run to install; add --part for additional members.
+  unset TAFFISH_REPEATMASKER_AUTO_MOUNT
+  taf-repeatmasker taf-repeatmasker-dfam verify --db-root /opt/RepeatMasker/Libraries/famdb
+  taf-repeatmasker famdb.py info
+  taf-repeatmasker -species human -dir rm-out genome.fa
+  The root + example member download is about 89 MB; other partitions are larger.
 
-Help behavior:
-  Upstream RepeatMasker normally uses a pager for help. This app sets PAGER=cat
-  so RepeatMasker -help and --help print directly and exit in non-interactive
-  TAFFISH, Docker, Podman, CI, and flow contexts.
+Shared data:
+  Admins can install once under /usr/local/share/taffish/databases/repeatmasker/dfam4
+  or /opt/taffish/databases/repeatmasker/dfam4, using the same installer.
+  Users need read/traverse access; ordinary users do not run the installer again.
+  Discovery: TAFFISH_REPEATMASKER_FAMDB_PATH, personal path, /usr/local/share, /opt/taffish.
+  Invalid/high-priority roots fail; set the override to another prepared root.
+  TAFFISH_REPEATMASKER_AUTO_MOUNT=0 disables discovery, useful for custom -lib.
+  Old loose .h5 folders need a new prepared root; keep the old files until migration.
 
-Platform:
-  Native platform is linux/amd64 only because this app uses the official
-  RMBlast x64 Linux binary. Docker and Podman request --platform linux/amd64;
-  arm64 hosts use amd64 emulation, not native arm64 execution.
+Backend selection (same CLI/data/report commands):
+  TAFFISH_CONTAINER_BACKEND=docker taf-repeatmasker -- -v
+  TAFFISH_CONTAINER_BACKEND=podman taf-repeatmasker -- -v
+  TAFFISH_CONTAINER_BACKEND=apptainer taf-repeatmasker -- -v
+  Apptainer needs native amd64 Linux. Docker/Podman request amd64 automatically;
+  ARM hosts need working amd64 emulation, not native ARM support.
 
-License:
-  TAFFISH app packaging: Apache-2.0.
-  Upstream RepeatMasker: OSL-2.1.
-  Packaged FamDB code and Dfam data notices: CC0.
-  RMBlast/NCBI components, UCSC utilities, external Dfam components,
-  RepBase, and user-provided resources keep their own license terms.
+Manual read-only DB mount (DB is an engine-visible prepared root):
+  export TAFFISH_REPEATMASKER_AUTO_MOUNT=0
+  DB=/absolute/path/dfam4
+  TAFFISH_CONTAINER_BACKEND=docker TAFFISH_DOCKER_RUN_ARGS="-v $DB:/opt/RepeatMasker/Libraries/famdb:ro" taf-repeatmasker famdb.py info
+  TAFFISH_CONTAINER_BACKEND=podman TAFFISH_PODMAN_RUN_ARGS="-v $DB:/opt/RepeatMasker/Libraries/famdb:ro" taf-repeatmasker famdb.py info
+  TAFFISH_CONTAINER_BACKEND=apptainer TAFFISH_APPTAINER_RUN_ARGS="--bind $DB:/opt/RepeatMasker/Libraries/famdb:ro" taf-repeatmasker famdb.py info
+  unset TAFFISH_REPEATMASKER_AUTO_MOUNT
 
-Boundaries:
-  This app does not include Dfam component data, RepBase, cross_match, or
-  ABBLAST. Dfam download is only performed when users explicitly run
-  download_dfam.py. Utility network fetches such as UCSC chrom.sizes downloads
-  and large genome-scale scientific validation are outside smoke tests.
+Troubleshooting:
+  Annotation is offline: missing Dfam members are not automatically downloaded.
+  Keep analysis FASTA paths free of spaces/shell-special characters (upstream limit).
+  For helper paths with spaces, preserve literal quotes, e.g.
+    --db-root "'/absolute/resource path/dfam4'" or --output "'report folder/view.html'"
+  Use a single-word species alias, or preserve quotes: -species "'Homo sapiens'".
+  Missing species: inspect famdb.py info, prepare required partitions in a new root.
+  Interrupted install: retry the identical command; corrupt caches fail with a path.
+  RepBase requires your own authorization and is not bundled. See README for details.
