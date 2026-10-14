@@ -1,4 +1,4 @@
-repeatmasker 4.2.5-r1
+repeatmasker 4.2.6-r1
 
 Purpose:
   Mask repeats in DNA FASTA using a custom library or prepared Dfam partitions.
@@ -23,6 +23,7 @@ Common options:
   -lib FILE      Custom repeat consensus FASTA
   -species NAME  Species/clade in prepared Dfam data
   -dir DIR       Writable output directory; prefer a new one for each run
+  -cache_dir DIR Optional writable cache; default is private temporary storage
   -a -gff -html  Also produce alignments, GFF and offline alignment HTML
   -xsmall        Soft-mask to lowercase
   -nolow -norna  Skip low-complexity/small-RNA masking, respectively
@@ -36,7 +37,6 @@ Outputs and utilities:
     --genome-size 3000000 --output landscape.html --title "'My repeat landscape'"
   Open landscape.html or rm-out/genome.fa.out.html locally; no network is needed.
   Alignment repeat-name links open the upstream website; HSP viewing stays offline.
-  Landscape: class filter, bar details, CSV (all data), SVG (current chart/legend).
   Use your actual genome-size denominator; existing HTML needs explicit --force.
   Original createRepeatLandscape.pl remains available but requires Google/network.
 
@@ -48,6 +48,7 @@ Prepare Dfam 4.0 (online, explicitly selected members):
   taf-repeatmasker taf-repeatmasker-dfam install --db-root "$PWD/dfam4" \
     --part curated.consensus.0 --dry-run
   Repeat without --dry-run to install; add --part for additional members.
+  The dry-run plan includes sizes, checksums and the resource license; it writes nothing.
   unset TAFFISH_REPEATMASKER_AUTO_MOUNT
   taf-repeatmasker taf-repeatmasker-dfam verify --db-root /opt/RepeatMasker/Libraries/famdb
   taf-repeatmasker famdb.py info
@@ -59,9 +60,8 @@ Shared data:
   or /opt/taffish/databases/repeatmasker/dfam4, using the same installer.
   Users need read/traverse access; ordinary users do not run the installer again.
   Discovery: TAFFISH_REPEATMASKER_FAMDB_PATH, personal path, /usr/local/share, /opt/taffish.
-  Invalid/high-priority roots fail; set the override to another prepared root.
+  Invalid roots/broken symlinks fail; set the override to another prepared root.
   TAFFISH_REPEATMASKER_AUTO_MOUNT=0 disables discovery, useful for custom -lib.
-  Old loose .h5 folders need a new prepared root; keep the old files until migration.
 
 Backend selection (same CLI/data/report commands):
   TAFFISH_CONTAINER_BACKEND=docker taf-repeatmasker -- -v
@@ -86,4 +86,4 @@ Troubleshooting:
   Use a single-word species alias, or preserve quotes: -species "'Homo sapiens'".
   Missing species: inspect famdb.py info, prepare required partitions in a new root.
   Interrupted install: retry the identical command; corrupt caches fail with a path.
-  RepBase requires your own authorization and is not bundled. See README for details.
+  RepBase needs your authorization. Full resource/advanced paths: see README.md.

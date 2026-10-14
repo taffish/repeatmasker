@@ -9,14 +9,26 @@ import os
 from pathlib import Path
 import re
 import shutil
+import signal
 import subprocess
 import sys
-import tempfile
+from taf_repeatmasker_runtime import private_directory, run_owned
 
 CATALOG = Path('/opt/taffish-repeatmasker/dfam-4.0.catalog.json')
 MANIFEST = 'taffish-famdb.json'
 INVENTORY = 'taffish-famdb.sha256'
 READY = 'taffish-famdb.ready'
+
+def interrupted(signum, frame):
+    # Exit once through finally; never resume installation after an interrupt.
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(sig, signal.SIG_IGN)
+    raise SystemExit(128 + signum)
+
+def run_child(argv):
+    rc = run_owned(argv)
+    if rc:
+        raise subprocess.CalledProcessError(rc, argv)
 
 def digest(path, algorithm='sha256'):
     h = hashlib.new(algorithm)
@@ -81,7 +93,8 @@ def install(args):
     root = Path(args.db_root).absolute()
     if root.is_symlink():
         raise ValueError('install target must not be a symlink')
-    plan = {'release': '4.0', 'root': str(root), 'parts': sorted(set(args.part)),
+    plan = {'release': '4.0', 'license': catalog()['license'], 'catalog_sha256': digest(CATALOG),
+            'root': str(root), 'parts': sorted(set(args.part)),
             'compressed_bytes': sum(m['compressed_bytes'] for m in members), 'members': members}
     if args.dry_run:
         print(json.dumps(plan, indent=2))
@@ -112,8 +125,7 @@ def install(args):
         estimate = plan['compressed_bytes'] * 4 + reserve
         if shutil.disk_usage(root.parent).free < estimate:
             raise ValueError('insufficient free space for conservative 4x compressed estimate')
-        stage = Path(tempfile.mkdtemp(prefix='.' + root.name + '.stage-', dir=root.parent))
-        try:
+        with private_directory(prefix='.' + root.name + '.stage-', dir=root.parent) as stage:
             inventory = []
             for m in members:
                 archive = cache / m['file']
@@ -124,9 +136,9 @@ def install(args):
                         raise ValueError('corrupt cached archive; inspect/remove this exact file before retry: ' + str(archive))
                 else:
                     print('Downloading ' + m['file'], flush=True)
-                    subprocess.run(['curl', '--fail', '--location', '--proto', '=https',
+                    run_child(['curl', '--fail', '--location', '--proto', '=https',
                                     '--retry', '3', '--retry-all-errors', '--connect-timeout', '30',
-                                    '--continue-at', '-', '--output', str(archive), m['url']], check=True)
+                                    '--continue-at', '-', '--output', str(archive), m['url']])
                 if archive.stat().st_size != m['compressed_bytes'] or digest(archive, 'md5') != m['md5']:
                     raise ValueError('official size/MD5 mismatch; invalid cache retained for diagnosis: ' + str(archive))
                 target = stage / m['file'][:-3]
@@ -142,8 +154,8 @@ def install(args):
                 target.chmod(0o644)
                 inventory.append({'file': target.name, 'bytes': target.stat().st_size,
                                   'sha256': h.hexdigest(), 'source_md5': m['md5'], 'source_url': m['url']})
-            doc = {'schema': 1, 'release': '4.0', 'license': 'CC0-1.0',
-                   'catalog_sha256': digest(CATALOG), 'parts': plan['parts'], 'members': inventory}
+            doc = {'schema': 1, 'release': '4.0', 'license': plan['license'],
+                   'catalog_sha256': plan['catalog_sha256'], 'parts': plan['parts'], 'members': inventory}
             (stage / MANIFEST).write_text(json.dumps(doc, indent=2) + '\n')
             lines = [m['sha256'] + '  ' + m['file'] for m in inventory]
             lines.append(digest(stage / MANIFEST) + '  ' + MANIFEST)
@@ -151,16 +163,13 @@ def install(args):
             (stage / READY).write_text(digest(stage / INVENTORY) + '\n')
             verify(stage)
             # Parse the real database before publication; no half-ready root.
-            subprocess.run(['famdb.py', '-i', str(stage), 'info'], check=True)
+            run_child(['famdb.py', '-i', str(stage), 'info'])
             for path in stage.iterdir():
                 path.chmod(0o644)
             stage.chmod(0o755)
             os.replace(stage, root)
             print('Installed and verified: ' + str(root))
             print('Ordinary users need read/traverse access to this root and every ancestor.')
-        finally:
-            if stage.exists():
-                shutil.rmtree(stage)
         # Keep the lock inode: unlinking it could split concurrent lock owners.
 
 def main():
@@ -175,6 +184,8 @@ def main():
     v.add_argument('--db-root', required=True)
     v.add_argument('--quick', action='store_true', help='check inventory and member sizes without rehashing all HDF5 data')
     a = p.parse_args()
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(sig, interrupted)
     try:
         if a.command == 'list':
             print(json.dumps(catalog(), indent=2))

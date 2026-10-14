@@ -1,7 +1,7 @@
 [package]
 name = "repeatmasker"
 kind = "tool"
-version = "4.2.5"
+version = "4.2.6"
 release = 1
 license = "Apache-2.0"
 main = "src/main.taf"
@@ -17,7 +17,7 @@ pipe = true
 command_mode = true
 
 [container]
-image = "ghcr.io/taffish/repeatmasker:4.2.5-r1"
+image = "ghcr.io/taffish/repeatmasker:4.2.6-r1"
 dockerfile = "docker/Dockerfile"
 build_platforms = "linux/amd64"
 
@@ -33,9 +33,9 @@ type = "github"
 repo = "Dfam-consortium/RepeatMasker"
 url = "https://github.com/Dfam-consortium/RepeatMasker"
 homepage = "https://www.repeatmasker.org/"
-release_url = "https://github.com/Dfam-consortium/RepeatMasker/releases/tag/v4.2.5"
-downloads = "https://codeload.github.com/Dfam-consortium/RepeatMasker/tar.gz/refs/tags/v4.2.5"
-version = "4.2.5"
+release_url = "https://github.com/Dfam-consortium/RepeatMasker/releases/tag/v4.2.6"
+downloads = "https://codeload.github.com/Dfam-consortium/RepeatMasker/tar.gz/refs/tags/v4.2.6"
+version = "4.2.6"
 license = "OSL-2.1; utility-specific notices; FamDB CC0; RMBlast/NCBI notices; UCSC CLI MIT"
 citation = "Smit, Hubley, and Green; Dfam Consortium; Camacho et al. 2009 for BLAST+"
 doi = "10.1186/1471-2105-10-421"

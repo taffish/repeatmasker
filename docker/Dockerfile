@@ -17,8 +17,8 @@ WORKDIR /tmp/build
 # 旧材料不可得须如实记录；更换官方冻结版本或固定 Kent commit 源码构建后，重验
 # twoBitInfo -noNs 和 rmToTrackHub 的两类 bigBed；已发布身份通过后继 release 修复。
 RUN set -eu; \
-    curl -fL --retry 3 --retry-all-errors https://codeload.github.com/Dfam-consortium/RepeatMasker/tar.gz/refs/tags/v4.2.5 -o repeatmasker.tar.gz; \
-    echo '2a863a62c01d631f733ee0e9d01278241a96dfc168dc8eb974c43a44bcf1d570  repeatmasker.tar.gz' | sha256sum -c -; \
+    curl -fL --retry 3 --retry-all-errors https://codeload.github.com/Dfam-consortium/RepeatMasker/tar.gz/refs/tags/v4.2.6 -o repeatmasker.tar.gz; \
+    echo '05e1ac50a8918de9b7dea6a298ca08702d518ec399489e7ae32d6b10addec1cf  repeatmasker.tar.gz' | sha256sum -c -; \
     curl -fL --retry 3 --retry-all-errors https://codeload.github.com/Dfam-consortium/FamDB/tar.gz/refs/tags/3.0.0 -o famdb.tar.gz; \
     echo 'cad4652696cbd6b3444ef1ea008764e4807eba503410bf24357c4505a5ddb8d4  famdb.tar.gz' | sha256sum -c -; \
     mkdir -p /opt/RepeatMasker/Libraries/famdb /opt/FamDB /opt/ucsc/bin; \
@@ -50,12 +50,12 @@ COPY --from=fetcher /opt/ucsc /opt/ucsc
 COPY --from=rmblast /opt/rmblast /opt/rmblast
 COPY docker/kent-LICENSE /opt/ucsc/LICENSE
 COPY docker/dfam-4.0.catalog.json /opt/taffish-repeatmasker/dfam-4.0.catalog.json
-COPY docker/patch-cache.py /opt/taffish-repeatmasker/patch-cache.py
 COPY docker/patch-html.py /opt/taffish-repeatmasker/patch-html.py
 COPY docker/landscape.html /opt/taffish-repeatmasker/landscape.html
 COPY docker/taf-repeatmasker-landscape.py /usr/local/bin/taf-repeatmasker-landscape
 COPY docker/taf-repeatmasker-dfam.py /usr/local/bin/taf-repeatmasker-dfam
 COPY docker/RepeatMasker /usr/local/bin/RepeatMasker
+COPY docker/taf_repeatmasker_runtime.py /usr/local/bin/taf_repeatmasker_runtime.py
 COPY docker/taf-repeatmasker-smoke /usr/local/bin/taf-repeatmasker-smoke
 ENV PATH=/usr/local/bin:/opt/RepeatMasker:/opt/RepeatMasker/util:/opt/FamDB:/opt/FamDB/utils:/opt/rmblast/bin:/opt/ucsc/bin:${PATH} \
     BLAST_USAGE_REPORT=false PAGER=cat PYTHONDONTWRITEBYTECODE=1 \
@@ -63,9 +63,10 @@ ENV PATH=/usr/local/bin:/opt/RepeatMasker:/opt/RepeatMasker/util:/opt/FamDB:/opt
 RUN set -eu; \
     chmod 0755 /usr/local/bin/RepeatMasker /usr/local/bin/taf-repeatmasker-dfam /usr/local/bin/taf-repeatmasker-smoke /usr/local/bin/taf-repeatmasker-landscape; \
     ln -s RepeatMasker /usr/local/bin/taf-repeatmasker-entrypoint; \
+    ln -s RepeatMasker /usr/local/bin/RepeatProteinMask; \
+    ln -s RepeatMasker /usr/local/bin/ProcessRepeats; \
     cd /opt/RepeatMasker; \
     TERM=dumb perl ./configure -trf_prgm /usr/bin/trf -rmblast_dir /opt/rmblast/bin -hmmer_dir /usr/bin -default_search_engine rmblast; \
-    python3 /opt/taffish-repeatmasker/patch-cache.py; \
     python3 /opt/taffish-repeatmasker/patch-html.py; \
     python3 -c 'import h5py, pandas'; \
     taf-repeatmasker-smoke identity; taf-repeatmasker-smoke tiny

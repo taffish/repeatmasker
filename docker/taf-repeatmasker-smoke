@@ -8,7 +8,7 @@ cd "$work"
 case "$stage" in
  identity)
   RepeatMasker -v >version.log 2>&1
-  grep -F 'RepeatMasker version 4.2.5' version.log
+  grep -Fx 'RepeatMasker version 4.2.6' version.log
   rmblastn -version >rmblast.log 2>&1
   grep -F 'rmblastn: 2.17.1+' rmblast.log
   blastx -version >blastx.log 2>&1
@@ -20,6 +20,8 @@ case "$stage" in
  help)
   RepeatMasker --help >help.log 2>&1
   grep -F -- '-lib' help.log >/dev/null
+  grep -F -- '-cache_dir' help.log >/dev/null
+  grep -F -- '-famdb_data_dir' help.log >/dev/null
   ProcessRepeats -help >process.log 2>&1
   famdb.py --help >famdb.log 2>&1
   grep -F '3.0.0' famdb.log
@@ -118,7 +120,7 @@ text = Path('out/twobit.html').read_text()
 assert text == Path('out/explicit.html').read_text(), 'twoBit landscape differs from non-N genome size'
 assert "['DNA/hAT', 48]" in text and "['Unmasked',0]" in text
 PY
-   # 上游 system() 未检查 bedToBigBed 返回值，必须验证两类真实二进制产物。
+   # 不只依赖上游退出码，验证两类真实二进制产物与源 TSV 一致。
    rmToTrackHub.pl -hubname tracks -genome tiny -chromsizes chrom.sizes \
     -out out/input.fa.out -align out/input.fa.align >trackhub.log 2>&1
    python3 - <<'PY'

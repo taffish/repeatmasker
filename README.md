@@ -1,18 +1,18 @@
 # repeatmasker
 
-`repeatmasker` packages [RepeatMasker](https://github.com/Dfam-consortium/RepeatMasker/releases/tag/v4.2.5) for TAFFISH.
+`repeatmasker` packages [RepeatMasker](https://github.com/Dfam-consortium/RepeatMasker/releases/tag/v4.2.6) for TAFFISH.
 
 Package identity: tool `repeatmasker`, command `taf-repeatmasker`, version
-`4.2.5-r1`, image `ghcr.io/taffish/repeatmasker:4.2.5-r1`.
+`4.2.6-r1`, image `ghcr.io/taffish/repeatmasker:4.2.6-r1`.
 Packaging license: Apache-2.0; upstream components keep their own licenses.
 
 ## What This App Packages
 
-RepeatMasker 4.2.5 masks interspersed repeats and low-complexity DNA. It keeps
+RepeatMasker 4.2.6 masks interspersed repeats and low-complexity DNA. It keeps
 upstream command mode and uses RMBlast 2.17.1+ by default. This release supports
 both RMBlast 2.x and 3.x; the app deliberately retains the tested 2.x engine.
-Source commit: `68f04286b0c68eec386b5fff7a4bee5ba170bb73`.
-Source SHA256: `2a863a62c01d631f733ee0e9d01278241a96dfc168dc8eb974c43a44bcf1d570`.
+Source commit: `74d2b41c9f2378773e7d42c7f7aac88f7f8df840`.
+Source SHA256: `05e1ac50a8918de9b7dea6a298ca08702d518ec399489e7ae32d6b10addec1cf`.
 
 ## Scope
 
@@ -68,22 +68,27 @@ taf-repeatmasker rmOutToGFF3.pl rm-out/genome.fa.out > rm-out/repeats.gff3
 Option-leading arguments go to RepeatMasker. Wrapper `--help`, `--version`
 and `--compile` belong to TAFFISH; use `-- -v` for upstream version. Explicit
 executables remain available, for example `taf-repeatmasker famdb.py info`.
-`RepeatMasker` and legacy `taf-repeatmasker-entrypoint` share one environment
-initializer; it enables FamDB only after prepared-root verification. It never
+`RepeatMasker`, `RepeatProteinMask`, `ProcessRepeats` and the legacy
+`taf-repeatmasker-entrypoint` share one environment initializer; it enables FamDB only after prepared-root verification. It never
 runs `configure` or writes an installation marker at runtime. The raw upstream
 executable remains at `/opt/RepeatMasker/RepeatMasker` for advanced usage.
 
-Asserted packaging patches make nucleotide libraries use the upstream per-job
-temporary directory and protein libraries use a private auto-cleaned `/tmp`
-directory, rather than the installation tree or `$HOME`.
-This trades cross-job cache reuse for read-only SIF compatibility; scientific
-search/join algorithms are unchanged. A second asserted patch defers Taxonomy's
-FamDB path lookup until object creation, after upstream applies its documented
-environment/command-line overrides (the original module captured the empty static
-value too early). The generated config also computes the prepared FamDB path at
-module load for ProcessRepeats and other helpers that read it before resolving
-environment options. Python bytecode and BLAST telemetry are
-disabled; `PAGER=cat` keeps help non-interactive.
+Upstream 4.2.6 supplies the cache and FamDB configuration interfaces previously
+handled by packaging patches. Those patches have been removed: the scientific
+Perl programs and Taxonomy module are unchanged upstream files. The environment
+initializer sets `REPEATMASKER_CACHE_DIR` to a private per-invocation temporary
+directory and removes it after its child exits. It never writes the image tree or
+database. Python bytecode and BLAST telemetry are disabled; `PAGER=cat` keeps help
+non-interactive.
+
+For optional persistent cache reuse, create a writable directory under the
+working directory and pass `-cache_dir cache` to RepeatMasker. This overrides
+the temporary default; its files remain yours to manage. Do not use a read-only
+shared database as the cache directory. The upstream `-famdb_dir /opt/FamDB
+-famdb_data_dir PATH` pair is also available for advanced, explicitly mounted
+data; automatic discovery remains the recommended prepared-root path.
+Environment variables set on the host are not implicitly forwarded into every
+container backend.
 
 ## Inputs and Output Notes
 
@@ -104,8 +109,9 @@ Dfam is a selectable external family, not bundled data. The fixed Dfam 4.0
 FamDB catalog is in `/opt/taffish-repeatmasker/dfam-4.0.catalog.json`. The root
 member is always required (60,708,386 compressed bytes); example member
 `curated.consensus.0` adds 28,260,067 bytes. Other consensus/HMM partitions can
-be much larger. `list` and `install --dry-run` show exact IDs, sizes, URLs and
-official MD5 values. Selection is the user's scientific decision; there is no
+be much larger. `list` and `install --dry-run` show exact IDs, sizes, URLs,
+official MD5 values and the resource license. The plan also identifies the fixed
+catalog by SHA256 and does not create an install root or lock. Selection is the user's scientific decision; there is no
 default whole-family download. HMMER searches require appropriate HMM members.
 
 Personal installation (choose required partitions, repeat `--part` as needed):
@@ -140,8 +146,9 @@ The Dfam resource license is CC0, separately from the software licenses below.
 
 Discovery priority: `TAFFISH_REPEATMASKER_FAMDB_PATH`, then the personal path,
 then `/usr/local/share`, then `/opt/taffish`. A higher-priority invalid or
-incomplete root fails closed; it does not search another root for missing species.
-Symlinks resolve to the physical root, which must be engine-visible. Paths
+incomplete root, including a dangling symlink, fails closed; it does not silently
+fall back to a lower-priority root or search another root for missing species.
+Valid symlinks resolve to the physical root, which must be engine-visible. Paths
 containing `:` or `,` cannot be auto-bound. Disable discovery using
 `TAFFISH_REPEATMASKER_AUTO_MOUNT=0` (also false/no/off).
 
@@ -155,6 +162,17 @@ The conservative initial free-space estimate is 4x compressed size plus 64 MiB;
 decompression also checks remaining space. Actual expansion is data-dependent.
 After verified success, the owner may remove the exact sibling `.dfam4.downloads`
 cache when no installer is running; do not remove the persistent lock inode.
+INT/TERM/HUP exit without resuming installation, reap the owned downloader/parser,
+and remove only this attempt's staging directory. The packaging runtime records
+signals during process/directory creation until ownership is registered, then
+exits with 130/143/129. Repeated signals do not interrupt cleanup; a child that
+ignores TERM is killed after a five-second grace period. The same protection
+covers the annotation launcher's private cache and owned process session.
+Before atomic promotion, no new
+root is exposed; after promotion, a fully verified root remains and retry is
+idempotent. Existing nonempty roots are never replaced. SIGKILL/power loss may
+leave a private stage/cache: inspect it before removing that exact stage, and do
+not delete another installer's lock or a previously prepared root.
 
 Automatic use validates inventory/ready checksums and file sizes; `verify`
 performs full SHA256 rehashing. Re-run full verification after transfers or suspected
@@ -262,134 +280,62 @@ the independent UCSC browser service or claim it passed this app's GUI tests.
 
 ## Testing
 
-### Previous candidate evidence (2026-10-06/07)
+Build-time checks are exact identity, imports and one tiny custom-library path.
+Runtime smoke adds helpers, resource planning/negative paths, real masking,
+GFF/BED/divergence/HTML, engine probes and UCSC bigBed records. Each manifest probe
+runs fresh/offline; production databases are not downloaded during smoke.
 
-The counts and image size in this subsection describe the candidate before the
-UCSC frozen-source repair. They are retained as historical evidence, not as tests
-of the replacement binaries; the source-repair results are recorded separately below.
+The 4.2.6-r1 successor passed a native amd64 no-cache build from the canonical
+app-root context. Docker/Podman normal and read-only roots plus the same-OCI
+read-only Apptainer SIF passed 200 fresh/offline probes (40 per configuration).
+All three real wrappers passed 113 checks; 75 resource checks cover actual
+representative installation, full verification, idempotency, old-root protection,
+locking and controlled INT/TERM at validation and atomic-promotion boundaries.
+Another 45 checks cover persistent cache reuse, explicit FamDB data paths,
+personal discovery, override/disable, isolated site-prefix priority, actual
+official download range resume and corrupt-cache rejection. The site-prefix
+checks execute the actual discovery expression with private test paths; they do
+not claim administrative deployment. Final wrapper metadata/runtime adds 12 checks.
 
-Build-time checks are identity/imports and one tiny custom-library masking path.
-Runtime smoke adds help, resource dry-run/negative paths, GFF/BED/divergence/HTML
-generation and engine probes. Production resources are not fetched during smoke.
-On native amd64 Linux, the final image passed 195 exact fresh/offline probes:
-Docker and Podman normal/read-only roots plus the same-OCI read-only Apptainer SIF.
-The real built wrapper passed 107 checks across the three backends, plus nine
-isolated personal-discovery/override/disable checks. Coverage includes custom
-masking, GFF/BED/divergence, offline/online HTML generation, Dfam species masking, a
-protein-search no-hit path, space/symlink resource paths, manual mounts, ordinary
-UID output, full verification and actual read-only write rejection. Docker also
-tested a second ordinary UID reading the same prepared data without write access.
-Nine additional GUI-generation calls used two real tiny repeat classes across
-Docker/Podman/Apptainer, including an otherwise unknown class; one short Docker
-`taf run` call also passed. Nine final host-side wrapper help/version/compile
-checks match the final 89-line help. Independent parser/escaping tests cover
-malformed input, non-finite values, duplicate classes/bins and HTML/JSON escaping.
-The viewer keeps all input counts; raw class summaries and bin totals are checked
-against the generated upstream divergence summary, not a hand-drawn chart.
-The visual repair adds 23 deterministic source/JavaScript/DOM-model checks
-(`node tests/test-landscape-logic.cjs`): fixed-scale filtering, readable tick
-formatting, zero/tiny values, long names, multi-class colors and CSV/SVG contents.
-These tests do not launch a browser or validate actual fonts/CSS/native downloads.
-Four English-only synthetic display fixtures supplement the real masking report;
-a separate Unicode fixture verifies that input titles/class names are preserved,
-not translated. The native class selector retains keyboard/focus behavior, with
-a decorative inset arrow and matching control spacing; forced-colors mode uses
-the native system arrow. Browser inspection was still pending at that stage;
-the 2026-10-12 browser acceptance below closes that gate for the current candidate.
+Additional repair regressions cover early child/directory creation, repeated
+signals, TERM-resistant children, dangling-resource discovery and consistency
+between dry-run, catalog and completion-manifest licenses. Controlled timing
+fixtures invoke the installed production functions through real wrappers; their
+tiny synthetic members do not substitute for actual FamDB parsing. Separate
+unmodified installer CLI tests interrupt a real curl transfer, then repeat the
+same command for recovery and idempotency. Apptainer's outer shell can exit just
+before its helper completes cleanup: tests require no owned downloader or stage
+within ten seconds (the observed real-download cleanup lag was about 0.06 seconds).
 
-The official Dfam 4.0 root and curated.consensus.0 were downloaded and verified;
-eight resource checks cover invalid selection, incomplete/corrupt roots, locking,
-cache corruption and real download resume through a wrapper. The helper/catalog
-bytes are unchanged from those download tests; final-image idempotent reuse and
-full verification passed on all three backends. Actual root-owned installation
-under `/usr/local/share` or `/opt/taffish` was not performed: only the shared-root
-mechanism/permissions were tested in a private directory. Other large Dfam/HMM
-partitions and production-scale protein/genome analyses were not validated.
+The final OCI image is 989,148,407 bytes. RMBlast accounts for about 625 MiB and
+is retained for complete search-engine functionality. Apt caches and Python
+bytecode are removed in the installation layer; fetch archives do not enter the
+final stage. Runtime data, examples, POD and license notices remain available.
+Native ARM and ARM-host emulation are not claimed. No backend exception is needed.
 
-AluY annotation and masked FASTA matched an unmodified official source/configure
-reference byte-for-byte on the same input and dependencies. The final image is
-999,707,898 bytes; Python bytecode/apt caches were removed in the installation
-layer. The 625 MiB RMBlast executable suite is retained for upstream compatibility.
-No compiler/sysroot was added; runtime data, examples, POD and licenses are retained.
+The offline landscape viewer is unchanged from its accepted predecessor. Its
+23 source/JavaScript/DOM-model checks cover filtering, scale, extreme values,
+long names, CSV and SVG semantics; these are not actual browser interaction tests.
+Current image-generated report data matches the upstream divergence summary.
+Native Chrome opened the current offline landscape and alignment files: filtering,
+axis/layout, HSP expansion/collapse and actual CSV/SVG downloads passed. Exported
+counts and provenance were independently checked. The unchanged viewer's previous
+narrow-window, multi-class and long-text browser acceptance is retained as such,
+not described as a fresh complete cross-browser run.
 
-`taf check`, docs checks, read-only hubctl and remote-checked publish dry-run pass;
-Action is a byte-identical copy of the fresh canonical template. Native ARM,
-ARM-host emulation and full-genome scientific accuracy are not claimed.
-No backend exception is needed. The approved offline helper and alignment asset
-fix are implemented; generated artifacts, data integrity and JS syntax pass.
-The reported overlapping Y-axis title/ticks was a defect in the TAFFISH-added
-viewer, not in upstream annotation results. The title is now horizontal above the
-plot, with compact ticks; responsive layout, long text and SVG context were also
-reworked. Maintainer review found the overall layout acceptable before the final
-select-arrow polish. The automation browser used at that stage disallowed local
-file URLs, so those checks did not establish browser acceptance. The separate
-2026-10-12 native Chrome acceptance below supersedes that pending status.
+Only the fixed Dfam 4.0 root and curated.consensus.0 representative member are
+used for integration tests. Controlled synthetic members exercise transaction
+interruption without pretending to be a scientific database. A private shared
+root demonstrates ordinary-user/read-only reuse, not actual root-owned deployment
+under /usr/local/share or /opt/taffish. Other Dfam partitions, full-genome accuracy,
+and production-scale protein searches are outside this packaging validation.
 
-### Frozen UCSC source repair (2026-10-12)
-
-The unpublished `4.2.5-r1` candidate now uses the official frozen v479 tools.
-An app-root native amd64 build with `--no-cache` fetched and verified the fixed
-materials successfully; after correcting a new test's join-track coordinate
-assumption, the final image was rebuilt and all current tests rerun. The first
-failed test receipts are retained separately, not counted as passes.
-
-The final OCI image is `sha256:db1b3572ba6f67f79e159382349206d483ff170140f56746c30f3442b59d45e9`
-(989,121,373 bytes). It passed 200 fresh/offline probes: combined exist, 31
-individual exist checks and eight independent tests on Docker/Podman normal and
-read-only roots, and a read-only Apptainer SIF made from that same OCI image.
-The new `ucsc` test checks real 2bit lengths (58 total, 48 non-N), the upstream
-landscape `-twoBit` path, and `rmToTrackHub.pl` output in both `bed9+5` and
-`bed3+14` formats. It decodes each bigBed record and checks it against the verified
-source TSV, distinguishing join-display bounds from actual alignment coordinates.
-A deliberately failing converter was rejected even though upstream does not
-propagate its exit status.
-
-All three real wrappers passed 113 checks in total, including persistent track-hub
-output, custom-library and representative Dfam masking, repeat-protein searches,
-prepared-root verification, read-only binds, ordinary-user permissions and
-space/symlink paths. The fixed Dfam root plus curated.consensus.0 was installed in
-the private test directory; no complete Dfam family or system-wide install was
-performed. Ten report-generation/development calls and five display-fixture
-generation checks also passed. These are not browser interaction or visual tests.
-The wrapper, help, report code, upstream identity and canonical Action remain
-unchanged from the task-start candidate. This source-repair run alone did not
-establish browser acceptance; the separate acceptance below closes that gate.
-Independent comparison found all 54 comparable annotation, masked-FASTA,
-divergence and HTML outputs byte-identical to the previous candidate. Final
-wrapper metadata checks, docs checks, 23 viewer logic tests and remote-checked
-publish dry-run passed. Generated targets were archived, leaving only `.gitkeep`;
-the private remote test directory was removed after receipt checksum verification.
-
-### Browser acceptance and final recheck (2026-10-12)
-
-Native Chrome 154.0.8037.98 on macOS opened the current image-generated files
-directly with `file://`. The final native selector, mouse and keyboard filtering,
-fixed-scale chart/table updates, bar details and keyboard focus passed. Actual CSV
-and SVG downloads were saved and independently checked against the embedded data:
-the filtered report's CSV retains both classes and all 71 bins (142 data rows),
-while its SVG contains only the selected class with complete source provenance.
-A 24-class SVG preserves all classes, 426 nonzero bars, long names and its footer;
-the downloaded SVG also rendered correctly when opened as a separate local file.
-
-Desktop and 390-by-844 CSS-pixel layouts were inspected, including keyboard
-horizontal scrolling to bin 70, readable focus/details, long titles, Unicode,
-tiny nonzero percentages and zero coverage. Alignment HTML passed individual HSP
-expansion plus open-all/close-all. DevTools Offline reload loaded only the local
-HTML document; filtering and keyboard interactions worked with an empty console.
-An initial DevTools-opening session reported a same-file unique-origin diagnostic;
-it did not recur after reload or during those offline interactions. No security
-setting was weakened. This is Chrome acceptance, not cross-browser certification,
-forced-colors visual acceptance or a new claim about the upstream online viewer.
-
-The unchanged OCI image above passed a fresh 200-probe backend matrix and a
-42-check real-wrapper subset (14 per backend); 23 viewer logic tests also passed.
-Fifteen representative output files match the previous run byte-for-byte.
-The earlier 113-check wrapper and resource evidence remains applicable to identical
-code; it is not represented as a full rerun. Fresh canonical Action comparison and
-RepeatMasker-only read-only upstream checks passed. No backend exception is needed.
-The existing native-platform, external-resource and scientific-validation limits
-remain in effect; local readiness does not mean publication or a passing future
-GitHub build/Hub Index run.
+An initial online Apptainer test incorrectly disabled the host resolver bind with
+an extra diagnostic `--no-mount bind-paths` option. Normal online wrapper settings
+passed after removing that test-only restriction; offline smoke retains network
+isolation. No app networking bypass or system change was needed. `taf check`, docs,
+read-only upstream checks and remote-checked publish dry-run passed. Readiness is
+not actual publication or a guarantee of future upstream hosting/CI availability.
 
 ## License and Citation
 

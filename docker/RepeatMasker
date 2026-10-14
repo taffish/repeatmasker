@@ -1,14 +1,49 @@
-#!/bin/sh
-# Environment initialization only; never configure or write the install tree.
-set -eu
-taf_rm_root=/opt/RepeatMasker/Libraries/famdb
-if [ -n "${FAMDB_DIR:-}" ]; then
-    : # Explicit upstream configuration remains available to advanced users.
-elif [ -e "$taf_rm_root/taffish-famdb.ready" ]; then
-    taf-repeatmasker-dfam verify --quick --db-root "$taf_rm_root" >/dev/null
-    export FAMDB_DIR=/opt/FamDB
-elif [ -n "$(ls -A "$taf_rm_root")" ]; then
-    printf '%s\n' 'RepeatMasker: unprepared FamDB root; use taf-repeatmasker-dfam install in a new empty directory, or set TAFFISH_REPEATMASKER_AUTO_MOUNT=0 for -lib.' >&2
-    exit 1
-fi
-exec /opt/RepeatMasker/RepeatMasker "$@"
+#!/usr/bin/python3
+"""Initialize verified FamDB and a private cache using upstream 4.2.6 interfaces."""
+import os
+from pathlib import Path
+import signal
+import sys
+from taf_repeatmasker_runtime import private_directory, run_owned
+
+
+def interrupted(signum, frame):
+    raise SystemExit(128 + signum)
+
+
+def run(argv, env):
+    return run_owned(argv, env)
+
+
+def main():
+    command = Path(sys.argv[0]).name
+    if command == 'taf-repeatmasker-entrypoint':
+        command = 'RepeatMasker'
+    if command not in ('RepeatMasker', 'RepeatProteinMask', 'ProcessRepeats'):
+        raise ValueError('unknown launcher name')
+    for sig in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+        signal.signal(sig, interrupted)
+    env = dict(os.environ)
+    root = Path('/opt/RepeatMasker/Libraries/famdb')
+    if env.get('FAMDB_DIR') or env.get('FAMDB_DATA_DIR'):
+        # Explicit upstream configuration remains available without auto-import.
+        env.setdefault('FAMDB_DIR', '/opt/FamDB')
+    elif (root / 'taffish-famdb.ready').exists():
+        rc = run(['taf-repeatmasker-dfam', 'verify', '--quick', '--db-root', str(root)], env)
+        if rc:
+            return rc
+        env['FAMDB_DIR'] = '/opt/FamDB'
+    elif any(root.iterdir()):
+        raise ValueError('unprepared FamDB root; use taf-repeatmasker-dfam install in a new empty directory, or disable auto-mount for -lib')
+    # A user -cache_dir takes precedence over this environment default.
+    # Explicit persistent caches must be on a writable bind, never the image tree.
+    with private_directory(prefix='taf-repeatmasker-cache-') as cache:
+        env.setdefault('REPEATMASKER_CACHE_DIR', str(cache))
+        return run(['/opt/RepeatMasker/' + command, *sys.argv[1:]], env)
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except (OSError, ValueError) as exc:
+        sys.exit('RepeatMasker environment: ' + str(exc))

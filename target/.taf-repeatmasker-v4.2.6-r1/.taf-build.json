@@ -1,0 +1,6 @@
+{
+  "artifact": "taf-repeatmasker-v4.2.6-r1",
+  "schema": "taffish.build/v1",
+  "source_sha256": "668e7f0e9a3a8f5fd1e66cb9e876079b1a5d27bddfe1e7c288385f2270320371",
+  "wrapper_sha256": "8c0d66a47a945e872c297e0fe305aad9fa00c6309580254ed1c3a29a294c07e2"
+}
